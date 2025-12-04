@@ -1,0 +1,65 @@
+
+.tb_modal{
+	position: fixed;  
+	top: 0;
+    left: 0;
+	z-index:6999;
+	width: 100%;
+    height: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
+    outline: 0; 
+    background-color: #21252999;
+    
+}
+
+.tx_modal_dlgframe{ 
+	max-width: 650px;
+	margin: 1.75rem auto;
+	color: var(--bk-box-color);
+	background-color: var(--bk-common-bgcolor);
+	border-radius: .3rem;
+}
+.tx_modal_dlgcontent {
+    position: relative;
+    display: flex;
+    flex-direction: column;
+    width: 100%;
+    max-width: 650px;
+    pointer-events: auto;
+    background-color: var(--modal-container-bgcolor);
+    background-clip: padding-box; 
+    border-radius: .3rem;
+    outline: 0;
+    box-shadow: var(--modal-dlg-shawdow);
+}
+
+.tx_modal_dlgheader {
+	color:var(--modal_header_color);
+    background-color: var(--modal-header-bgcolor); 
+    display: flex;
+    flex-shrink: 0;
+    flex-direction: row-reverse;
+    align-items: center;
+    justify-content: space-between;
+    padding: .5rem 1rem;
+    border-top-left-radius: calc(.3rem - 1px);
+    border-top-right-radius: calc(.3rem - 1px);
+}	
+.tx_modal_dlgcontainer
+{
+	padding-left:20px ;
+	padding-right:20px ;
+	padding-bottom:20px ;
+	padding-top:20px ;
+}
+
+.tb_modal_baike_btn
+{
+	background-color: var(--modal-header-bgcolor); 
+	color:var(--modal_header_color);
+	position:absolute;
+    right: -21px;
+    top: 46px;
+    width: 19px; 
+}

@@ -1,0 +1,305 @@
+<!DOCTYPE html>
+<html class="blueeee">  
+<head>
+<meta charset="utf-8" >
+<title>官职信息</title>  
+<link href="../bootstrap/5.1.1/bootstrap.min.css" rel="stylesheet">
+<script src="../bootstrap/5.1.1/bootstrap.bundle.min.js"></script>   
+<script src="../js/vue.global.js"></script>
+<script src="../js/axios.min.js"></script> 
+<link href="css_book.css?555" rel="stylesheet">  
+<script src="js_book.js"></script>
+
+</head>
+<body>
+<div id = "app"   > 
+<div class="tx_topLev2" style="width: 91%;" > </div>  
+ <div class="bk_oneframe" style="background-color: aliceblue;margin-top: 0px;">    
+	 <div class="bk_onerow" style="position: fixed;width: 89.5%;background-color: aliceblue;z-index: 1234;">  
+		<div   class="tb_header" style="margin-top:20px ;" >	 
+				 古代官职一览表
+		</div> 
+	
+		<div class="bk_onerow tb_rowcellboder" 
+		style="font-weight: bold;width: 100%;border: var(--cell-boder );"  @onmousedown="clearEdit()">
+				<div style="width: 5%;padding-left:8px;"  >编号</div >	 
+				<div style="width: 15%;padding-left:8px;" class="tb_cellboder_left ">
+					<input type="text"  @change="reloadData()" v-model="fpostName" class="bk_tabTitleLabel" placeholder="官名"  ></div >	 	
+				<div style="width: 30%;padding-left:8px;" class="tb_cellboder_left">级别</div >	 
+				<div style="width: 50%;padding-left:8px;" class="tb_cellboder_left">
+					<input type="text"  @change="reloadData()" v-model="fpostFunctions" class="bk_tabTitleLabel" placeholder="功能描述"  > </div >  
+		</div> 
+	</div >
+	
+	<div style="margin-top: 87px;"  >  
+		<div class="bk_onerow  tb_rowcellboder tb_mouse_row"   v-for="(item,index) in persons" > 
+				<div style="width: 5%;padding-left:8px;cursor: pointer;"  
+				@click="toEdit(item)" 
+				data-bs-toggle="modal"  
+				data-bs-target="#editModal" >{{index+1}}</div >	 
+				<div style="width: 15%;padding-left:8px;cursor: pointer;" 
+				class="tb_cellboder_left " 
+				@click="toShowDetail(item)" 
+				data-bs-toggle="modal"  
+				data-bs-target="#showModal">{{item.postName}}</div >	 	
+				<div style="width: 15%;padding-left:8px;" class="tb_cellboder_left">{{item.postLevel}}</div >	
+				<div style="width: 15%;padding-left:8px;" class="tb_cellboder_left" v-html="cutContent(item.levelDetails,10)">{{cutContent(item.levelDetails,10)}}</div >  
+				<div style="width: 50%;padding-left:8px;" 
+				class="tb_cellboder_left" 
+				v-html="cutContent(item.postDetails,40)" ></div >
+		</div>  
+		<div class="bk_onerow  tx_rowcellboder tx_tab_row"   > 
+				<div style="width: 5%;padding-left:8px;"  > &emsp;</div >	  
+		</div>  
+		 
+	</div> 
+		
+	
+   
+</div>
+
+
+<!-- 详情显示模态框 -->
+<div class="modal" id="showModal" style="z-index: 2234;">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content"> 
+      <!-- 模态框头部 -->
+      <div class="tb_modal_header"> 
+		  <h4 class="modal-title">官职信息 -- {{postName}}</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"> </button>
+        
+      </div>
+       
+      <!-- 模态框内容 -->
+      <div class="modal-body">
+        <div class="container mt-3">
+ 	
+			<form  class="needs-validation">
+				 
+				<div class="bk_onerow "   >
+						<div style="width: 13%; "  ><span class="tb_input_label">官职名称</span></div >	 
+						<div style="width: 85%; "  ><span class="tb_input_value">{{postName}}</span> </div >	 
+				</div> 
+				<div class="bk_onerow "   >
+						<div style="width: 13%; "  ><span class="tb_input_label">官职级别</span></div >	 
+						<div style="width: 85%; "  ><span class="tb_input_value">{{postLevel}}</span> </div >	 
+				</div> 
+				<div class="bk_onerow "   >
+						<div style="width: 13%; "  ><span class="tb_input_label">官职名称</span></div >	 
+						<div style="width: 85%; "  ><span class="tb_input_value">{{postFunctions}}</span> </div >	 
+				</div> 
+			  
+				<!-- 模态框底部 -->
+			  	<div class="modal-footer">
+					<button type="button" class="btn btn-danger" data-bs-dismiss="modal">关闭</button> 
+			  </div>				
+			</form>
+		</div>
+      </div>
+    </div>
+  </div>
+</div> 
+
+
+<!-- 编辑模态框 -->
+<div class="modal" id="editModal" style="z-index: 2234;">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content"> 
+      <!-- 模态框头部 -->
+      <div class="tb_modal_header"> 
+		  <h4 class="modal-title">官职信息 -- {{postName}} ({{saveFlag}})</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"> </button>
+        
+      </div>
+       
+      <!-- 模态框内容 -->
+      <div class="modal-body">
+        <div class="container mt-3">
+ 	
+			<form  class="needs-validation">
+				 <input type="hidden" v-model="postId"   class="form-control" >
+				<div class="bk_onerow "   >
+						<div style="width: 13%; "  ><span class="tb_input_label">官职名称</span></div >	 
+						<div style="width: 85%; "  >
+							<input type="text" v-model="postName"  class="form-control" placeholder="官职名称"  > 
+						</div >	 
+				</div> 
+				<div class="bk_onerow "   >
+						<div style="width: 13%; "  ><span class="tb_input_label">官职级别</span></div >	
+						<div style="width: 85%; "  > <input type="text" v-model="postLevel"  class="form-control" placeholder="级别(中央-州郡-地方)"  > </div >	  	
+				</div> 
+				<div class="bk_onerow "   >
+						<div style="width: 13%; "  ><span class="tb_input_label">级别详情</span></div >	
+						<div style="width: 85%; "  > <input type="text" v-model="postLevelDetail"  class="form-control" placeholder="级别详细(品级等)"  > </div >	  	
+				</div> 
+				<div class="bk_onerow "   >
+						<div style="width: 13%; "  ><span class="tb_input_label">官职描述</span></div >	 
+						<div style="width: 85%; "  >
+							<textarea  cols="8" rows="10"  v-model="postFunctions"  class="form-control" placeholder="简介描述"></textarea>
+ 
+							
+						</div >	 
+				</div> 
+			  
+				<!-- 模态框底部 -->
+			  	<div class="modal-footer">
+					<button type="button" class="btn btn-danger" data-bs-dismiss="modal">关闭</button>
+					<button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="savePost" >保存</button> 
+			  </div>				
+			</form>
+		</div>
+      </div>
+    </div>
+  </div>
+</div> 
+
+<div class="fixed-btn"> 
+	
+<a  class="fixed-btn-a" @click="toAddPost" 
+style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#editModal"> 
+<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-plus-circle" viewBox="0 0 16 16">
+  <path d="M8 15A7 7 0 1 1 8 1a7 7 0 0 1 0 14zm0 1A8 8 0 1 0 8 0a8 8 0 0 0 0 16z"/>
+  <path d="M8 4a.5.5 0 0 1 .5.5v3h3a.5.5 0 0 1 0 1h-3v3a.5.5 0 0 1-1 0v-3h-3a.5.5 0 0 1 0-1h3v-3A.5.5 0 0 1 8 4z"/>
+</svg>
+</a>
+
+
+<a  class="fixed-btn-a" href="index.html"> 
+<svg xmlns="img/index.svg" width="25" height="25" fill="currentColor"   viewBox="0 0 16 16">
+  <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L8 2.207l6.646 6.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.707 1.5Z"/>
+  <path d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6Z"/>
+</svg>
+</a>
+
+<a  class="fixed-btn-a"  href="pers.html"  target="_blank"> 
+<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor"   viewBox="0 0 16 16">
+  <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+</svg>
+</a>
+ 
+<a  class="fixed-btn-a"  href="dynasty.html" target="_blank"> 
+<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-people" viewBox="0 0 16 16">
+  <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002a.274.274 0 0 1-.014.002H7.022zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816zM4.92 10A5.493 5.493 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275zM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
+</svg>
+</a>
+
+<a  class="fixed-btn-a"  href="search.html"  target="_blank"> 
+   <svg xmlns="img/search.svg" width="25" height="25" fill="currentColor"   viewBox="0 0 16 16">
+  <path d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+</svg>
+</a>
+    
+    
+</div> 
+
+</div> 
+ 
+<script>
+
+
+  
+const app = {
+	data() {
+		return {
+			 persons:[],  
+			 postName:'',
+			 postLevel:'',
+			 postLevelDetail:'',
+			 postFunctions:'',
+			 postId:0,
+			 saveFlag:'编辑',
+			 saveType:0
+		}
+	}, 
+	mounted () {
+		 	  
+		this.reloadData()
+	} ,
+	methods: { 
+		reloadData()
+		{  
+			const params = {   
+				 postName:this.fpostName,
+				 postDetails:this.fpostFunctions,
+		 	}	 
+		 	
+		 	axios.get('/selectgovpost' ,{params:params})
+			  .then(response => {
+				  this.persons = response.data.reObject  
+				})
+			  .catch(function (error) {  
+				 showErrTips(error) 
+				});  
+	                    
+		}  ,
+	   cutContent(content,n)
+		{
+			lenn = content.length  
+			if(lenn<n)
+			{
+				return content
+			}  
+			
+			tipHtml  = "<span   title=\" " + content + "\">" + content.substring(0,n-5) + "...</span>"
+			 
+			return   tipHtml
+		},
+		
+		toShowDetail(item)
+		{
+			this.postLevel = item.postLevel + "-" + item.levelDetails
+			this.postName = item.postName 
+			this.postFunctions = item.postDetails
+		}
+		,
+		
+		toEdit(item)
+		{
+			this.saveFlag = '编辑' 
+			this.postLevel = item.postLevel  
+			this.postLevelDetail = item.levelDetails
+			this.postName = item.postName 
+			this.postFunctions = item.postDetails
+			this.postId = item.postId
+		},
+		toAddPost()
+		{
+			this.saveFlag = '新增'
+			this.postId = 0
+			this.postLevel = ''
+			this.postLevelDetail = ''
+			this.postName = ''
+			this.postFunctions = ''
+		},
+		savePost()
+		{
+			const params = {  
+				postId : this.postId,
+				postName : this.postName,
+				postLevel : this.postLevel,
+				levelDetails : this.postLevelDetail,
+				postDetails : this.postFunctions  
+			}
+			  
+             axios
+			  .post('/savepost', params)
+			  .then(
+			  function (response) {
+				  showOKTips(params.postName + "：保存成功！")
+			  }  
+			  )
+			  .catch(function (error) { // 请求失败处理
+				  showErrTips(params.postName + "：保存失败！")
+			});    
+		},
+		
+	}
+	 
+}
+ 
+vm = Vue.createApp(app).mount('#app')
+ 
+</script>
+ 
+</body>
+</html>

@@ -1,0 +1,748 @@
+<!DOCTYPE html>
+<html class="ECLLIPDARK">
+<head>
+<meta charset="utf-8">
+<title>嗖</title>  
+<link href="../bootstrap/5.1.1/bootstrap.min.css" rel="stylesheet">
+<script src="../bootstrap/5.1.1/bootstrap.bundle.min.js"></script> 
+<script src="../js/vue.global.js"></script>
+<script src="../js/axios.min.js"></script> 
+<link href="css_book.css" rel="stylesheet"> 
+<link href="css_modal.css" rel="stylesheet"> 
+<script src="js_book.js"></script>
+</head>
+<body  >
+<div id = "app"  @mousedown="clearSel" > 
+<div id="persondiv"></div>	
+<div   style="position: fixed;width:5.5% ;left:0px; top:0px;height: 1500px; " @mousedown="hiddenMenu">
+</div >		  
+<div   style="position: fixed;width:5.5% ;right:0px; top:0px;height: 1500px; " @mousedown="hiddenMenu">
+</div >	
+<div class="bk_content_frame" @mousedown="clearSel"  >
+	 
+<div class="bk_content_title"  >  
+	   
+		  
+		<div  style="width: 80% ;padding-left: 20px;">
+			<a  class="tb_book_menu"  @click="showBooksMenu"   > 
+				    <svg  width="25" height="25" fill="currentColor" viewBox="0 0 16 16">
+					  <path fill-rule="evenodd" d="M2 12.5a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5zm0-3a.5.5 0 0 1 .5-.5h11a.5.5 0 0 1 0 1h-11a.5.5 0 0 1-.5-.5z"/>
+					</svg>
+				</a>
+				 &emsp;<b>{{book.chiefAlbum}}.{{book.name}} </b> 
+		</div >	 
+		<div  style="width: 2% " > 
+				
+		</div >	 
+		<!-- 
+		<div  style="width: 23% " > 
+				 <a id="showy" style="cursor: pointer;"   @click="showTrans(0)" >  原  </a>
+					   &emsp;<a  id="showd" style="cursor: pointer;"  @click="showTrans(1)" >  段  </a>
+					   &emsp;<a  id="showt" style="cursor: pointer;"  @click="showTrans(2)" >  译  </a>
+		</div >	 
+		-->          
+</div >         
+ 
+<div  class="bk_content_box" style="margin-top:37px ;margin-bottom:20px ;">
+	<div class="bk_content_boxinner"> 	  
+	    <div  v-for="para in paras" v-bind:id="para.gid"  
+	    class="para_border" @mouseup="handleMouseUp(para)" 
+	    @mousedown="handleMouseDown(para)" >  
+		  <div class="tarsvg" v-if="para.gid==paraIdSel"  style="z-index: 9999; color: var(--fixed--btn--color);display:flex;flex-direction: row-reverse;margin-top:-33px; " > 
+				<a  style="cursor: pointer;"  data-bs-toggle="modal" data-bs-target="#myModal"  > 
+				    <svg   xmlns="img/edit.svg" width="22" height="22" fill="currentColor"   viewBox="0 0 16 16">
+				  <path d="M15.502 1.94a.5.5 0 0 1 0 .706L14.459 3.69l-2-2L13.502.646a.5.5 0 0 1 .707 0l1.293 1.293zm-1.75 2.456-2-2L4.939 9.21a.5.5 0 0 0-.121.196l-.805 2.414a.25.25 0 0 0 .316.316l2.414-.805a.5.5 0 0 0 .196-.12l6.813-6.814z"/>
+				  <path fill-rule="evenodd" d="M1 13.5A1.5 1.5 0 0 0 2.5 15h11a1.5 1.5 0 0 0 1.5-1.5v-6a.5.5 0 0 0-1 0v6a.5.5 0 0 1-.5.5h-11a.5.5 0 0 1-.5-.5v-11a.5.5 0 0 1 .5-.5H9a.5.5 0 0 0 0-1H2.5A1.5 1.5 0 0 0 1 2.5v11z"/>
+				</svg>
+				</a>
+				 
+				<!-- 
+				<a   style="cursor: pointer;padding-right:10px ;" @click="newTarget()" >
+					<svg   xmlns="http://www.w3.org/2000/svg" width="22px" height="22px" viewBox="0 0 24 24"><path fill="currentColor" d="M18 14v-3h-3V9h3V6h2v3h3v2h-3v3zm-9-2q-1.65 0-2.825-1.175T5 8t1.175-2.825T9 4t2.825 1.175T13 8t-1.175 2.825T9 12m-8 8v-2.8q0-.85.438-1.562T2.6 14.55q1.55-.775 3.15-1.162T9 13t3.25.388t3.15 1.162q.725.375 1.163 1.088T17 17.2V20z"/></svg>
+				</a>
+				-->
+				
+				<a style="cursor: pointer;padding-right:10px ;" >
+					<svg   xmlns="http://www.w3.org/2000/svg" width="22px" height="22px" fill="currentColor" class="bi bi-bookmark-plus" viewBox="0 0 16 16">
+						  <path d="M2 2a2 2 0 0 1 2-2h8a2 2 0 0 1 2 2v13.5a.5.5 0 0 1-.777.416L8 13.101l-5.223 2.815A.5.5 0 0 1 2 15.5V2zm2-1a1 1 0 0 0-1 1v12.566l4.723-2.482a.5.5 0 0 1 .554 0L13 14.566V2a1 1 0 0 0-1-1H4z"/>
+						  <path d="M8 4a.5.5 0 0 1 .5.5V6H10a.5.5 0 0 1 0 1H8.5v1.5a.5.5 0 0 1-1 0V7H6a.5.5 0 0 1 0-1h1.5V4.5A.5.5 0 0 1 8 4z"/>
+					</svg>
+				</a>
+				
+				
+				
+			</div> 	 
+	       	<div class=" bk_onecontent mousetar"  @mouseup="showMsg"
+	       style="margin-right:0.1rem;margin-left:0.3rem"  > 
+			  &emsp;&emsp;<span v-bind:id="'cont' + para.gid">{{para.content}}</span> 
+			   
+		  	</div> 
+	       	<div class="bk_transcation mousetar"  @mouseup="showMsg"  style=" margin-right:0.1rem;margin-left:0.3rem"  > 
+			  &emsp;&emsp;<span v-bind:id="'trans' + para.gid">{{para.transcation}}</span>  
+		  		
+		  	
+		  	</div> 
+	      	
+	  	</div>
+  	 </div> 
+ 
+</div>  
+ 
+<div  class="tb_bookmenu_list_hidden" id="bookmenulist"  > 
+	<div class="bk_onerow tb_bookmenu"> 
+		&emsp;{{book.chiefAlbum}}.{{book.volume}}
+	</div>
+	 
+	<div class="bk_onerow tb_bookmenu"> 
+		<div class="bk_onerow tb_bookmenu"  style="width: 100%;" v-for="menu in menuBooks"  > 
+		<div v-if="menu.bid==book.bid" style="color: dimgrey;"> 
+			&emsp;&emsp;{{cutContent( menu.name,16)}}  </div>
+		<div v-else @click="showconntent(menu.bid)"  
+			style="cursor: pointer;width: 100%;">  
+			 	 &emsp;&emsp;{{cutContent( menu.name,16)}}  
+		</div>
+		</div> 
+		 
+	</div>  
+</div> 	  
+
+<div  class="tb_targettips_hidden" id="targetshowmsg"  > 
+	<div class="bk_onerow" style=" padding-bottom: 3px;"> 
+		<div style="width: 80%;margin-top: 3px;margin-left: 3px;">
+		<input type="hidden" v-model="targetName"  class="tb_input_text" >
+		<select style="font-size: 0.78rem;background-color: var(--control--select--bgcolor);"  class=" form-select" v-model="selTarget"  >
+			<option v-for="selTar  in selTargets" >
+			  {{ selTar }}  
+			</option>
+		</select> 
+		 
+		</div>  
+		<div style="width: 16%; margin-top: 3px;">
+		 <a  style="margin-left: 12px;cursor: pointer;" class="btn-add-target"  @click='addTarget()'> 
+				<svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-person-add" viewBox="0 0 16 16">
+				  <path fill-rule="evenodd" d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm.5-5a.5.5 0 0 0-1 0v1h-1a.5.5 0 0 0 0 1h1v1a.5.5 0 0 0 1 0v-1h1a.5.5 0 0 0 0-1h-1v-1Zm-2-6a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/>
+				  <path d="M8.256 14a4.474 4.474 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10c.26 0 .507.009.74.025.226-.341.496-.65.804-.918C9.077 9.038 8.564 9 8 9c-5 0-6 3-6 4s1 1 1 1h5.256Z"/>
+				</svg>
+		 </a>
+		 <!-- 
+		 <a style="margin-left: 10px;cursor: pointer;" class="btn-add-target"  @click='addPost()'> 
+				<svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" fill="currentColor" class="bi bi-shield-plus" viewBox="0 0 16 16">
+				  <path d="M5.338 1.59a61.44 61.44 0 0 0-2.837.856.481.481 0 0 0-.328.39c-.554 4.157.726 7.19 2.253 9.188a10.725 10.725 0 0 0 2.287 2.233c.346.244.652.42.893.533.12.057.218.095.293.118a.55.55 0 0 0 .101.025.615.615 0 0 0 .1-.025c.076-.023.174-.061.294-.118.24-.113.547-.29.893-.533a10.726 10.726 0 0 0 2.287-2.233c1.527-1.997 2.807-5.031 2.253-9.188a.48.48 0 0 0-.328-.39c-.651-.213-1.75-.56-2.837-.855C9.552 1.29 8.531 1.067 8 1.067c-.53 0-1.552.223-2.662.524zM5.072.56C6.157.265 7.31 0 8 0s1.843.265 2.928.56c1.11.3 2.229.655 2.887.87a1.54 1.54 0 0 1 1.044 1.262c.596 4.477-.787 7.795-2.465 9.99a11.775 11.775 0 0 1-2.517 2.453 7.159 7.159 0 0 1-1.048.625c-.28.132-.581.24-.829.24s-.548-.108-.829-.24a7.158 7.158 0 0 1-1.048-.625 11.777 11.777 0 0 1-2.517-2.453C1.928 10.487.545 7.169 1.141 2.692A1.54 1.54 0 0 1 2.185 1.43 62.456 62.456 0 0 1 5.072.56z"/>
+				  <path d="M8 4.5a.5.5 0 0 1 .5.5v1.5H10a.5.5 0 0 1 0 1H8.5V9a.5.5 0 0 1-1 0V7.5H6a.5.5 0 0 1 0-1h1.5V5a.5.5 0 0 1 .5-.5z"/>
+				</svg>
+		 </a>
+		 -->
+		</div> 
+	</div> 	
+	<div class="tb_targettips_content" style="margin-top: 5px;" v-if="targetNums>0"> 
+		<a @click='uptar()'> 
+			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-left" viewBox="0 0 16 16">
+  				<path d="M10 12.796V3.204L4.519 8 10 12.796zm-.659.753-5.48-4.796a1 1 0 0 1 0-1.506l5.48-4.796A1 1 0 0 1 11 3.204v9.592a1 1 0 0 1-1.659.753z"/>
+			</svg>
+		</a>
+		<a  >  
+			{{showIndex+1}}/{{targetNums}} 
+		</a>
+		<a @click='nexttar()'> 
+			<svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-caret-right" viewBox="0 0 16 16">
+			  <path d="M6 12.796V3.204L11.481 8 6 12.796zm.659.753 5.48-4.796a1 1 0 0 0 0-1.506L6.66 2.451C6.011 1.885 5 2.345 5 3.204v9.592a1 1 0 0 0 1.659.753z"/>
+			</svg>
+		</a>
+		<span v-if="targetObj.graphId == paraId" > <svg xmlns='http://www.w3.org/2000/svg' width='13' height='13' fill='red' class='bi bi-geo-alt' viewBox='0 0 16 16'>  <path d='M12.166 8.94c-.524 1.062-1.234 2.12-1.96 3.07A31.493 31.493 0 0 1 8 14.58a31.481 31.481 0 0 1-2.206-2.57c-.726-.95-1.436-2.008-1.96-3.07C3.304 7.867 3 6.862 3 6a5 5 0 0 1 10 0c0 .862-.305 1.867-.834 2.94zM8 16s6-5.686 6-10A6 6 0 0 0 2 6c0 4.314 6 10 6 10z'/>  <path d='M8 8a2 2 0 1 1 0-4 2 2 0 0 1 0 4zm0 1a3 3 0 1 0 0-6 3 3 0 0 0 0 6z'/></svg></span>
+		<span @click="showW(targetObj)" style="cursor: pointer;" >  {{targetObj.name}}:{{targetObj.detail}} </span> 
+		 
+	</div>   
+	  
+</div>
+
+<div class="fixed-btn-topleft"  style="cursor: pointer;" > 
+  
+	<div class="fixed-btn-a "  id="flagShowTips"   @click="checkShowTips"> 
+		<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-bell" viewBox="0 0 16 16">
+		  <path d="M8 16a2 2 0 0 0 2-2H6a2 2 0 0 0 2 2zM8 1.918l-.797.161A4.002 4.002 0 0 0 4 6c0 .628-.134 2.197-.459 3.742-.16.767-.376 1.566-.663 2.258h10.244c-.287-.692-.502-1.49-.663-2.258C12.134 8.197 12 6.628 12 6a4.002 4.002 0 0 0-3.203-3.92L8 1.917zM14.22 12c.223.447.481.801.78 1H1c.299-.199.557-.553.78-1C2.68 10.2 3 6.88 3 6c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0A5.002 5.002 0 0 1 13 6c0 .88.32 4.2 1.22 6z"/>
+		</svg> 
+	</div>  
+	 
+	<div class="fixed-btn-a-hidden "   id="flagCloseTips"   @click="checkShowTips"> 
+		<svg xmlns="http://www.w3.org/2000/svg" width="22" height="22" fill="currentColor" class="bi bi-bell-slash" viewBox="0 0 16 16">
+		  <path d="M5.164 14H15c-.299-.199-.557-.553-.78-1-.9-1.8-1.22-5.12-1.22-6 0-.264-.02-.523-.06-.776l-.938.938c.02.708.157 2.154.457 3.58.161.767.377 1.566.663 2.258H6.164l-1 1zm5.581-9.91a3.986 3.986 0 0 0-1.948-1.01L8 2.917l-.797.161A4.002 4.002 0 0 0 4 7c0 .628-.134 2.197-.459 3.742-.05.238-.105.479-.166.718l-1.653 1.653c.02-.037.04-.074.059-.113C2.679 11.2 3 7.88 3 7c0-2.42 1.72-4.44 4.005-4.901a1 1 0 1 1 1.99 0c.942.19 1.788.645 2.457 1.284l-.707.707zM10 15a2 2 0 1 1-4 0h4zm-9.375.625a.53.53 0 0 0 .75.75l14.75-14.75a.53.53 0 0 0-.75-.75L.625 15.625z"/>
+		</svg>
+	</div> 
+	 
+</div>               
+ 
+<div class="fixed-btn-top">  
+	
+	<a id="btn1" class="fixed-btn-a" style="cursor: pointer;"  @click="changeTheme" > 
+	<svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="currentColor" class="bi bi-emoji-sunglasses" viewBox="0 0 16 16">
+	  <path d="M4.968 9.75a.5.5 0 1 0-.866.5A4.498 4.498 0 0 0 8 12.5a4.5 4.5 0 0 0 3.898-2.25.5.5 0 1 0-.866-.5A3.498 3.498 0 0 1 8 11.5a3.498 3.498 0 0 1-3.032-1.75zM7 5.116V5a1 1 0 0 0-1-1H3.28a1 1 0 0 0-.97 1.243l.311 1.242A2 2 0 0 0 4.561 8H5a2 2 0 0 0 1.994-1.839A2.99 2.99 0 0 1 8 6c.393 0 .74.064 1.006.161A2 2 0 0 0 11 8h.438a2 2 0 0 0 1.94-1.515l.311-1.242A1 1 0 0 0 12.72 4H10a1 1 0 0 0-1 1v.116A4.22 4.22 0 0 0 8 5c-.35 0-.69.04-1 .116z"/>
+	  <path d="M16 8A8 8 0 1 1 0 8a8 8 0 0 1 16 0zm-1 0A7 7 0 1 0 1 8a7 7 0 0 0 14 0z"/>
+	</svg>
+	</a>
+	
+	<a   class="fixed-btn-a" style="cursor: pointer;"  href="#" > 
+	<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-chevron-bar-up" viewBox="0 0 16 16">
+	  <path fill-rule="evenodd" d="M3.646 11.854a.5.5 0 0 0 .708 0L8 8.207l3.646 3.647a.5.5 0 0 0 .708-.708l-4-4a.5.5 0 0 0-.708 0l-4 4a.5.5 0 0 0 0 .708zM2.4 5.2c0 .22.18.4.4.4h10.4a.4.4 0 0 0 0-.8H2.8a.4.4 0 0 0-.4.4z"/>
+	</svg>
+	</a>
+	  	   	 
+	<a   class="fixed-btn-a" style="cursor: pointer;"  v-bind:href="'#'+ paraId"   > 
+	<svg xmlns="http://www.w3.org/2000/svg" width="23" height="23" fill="currentColor" class="bi bi-pin-map" viewBox="0 0 16 16">
+	  <path fill-rule="evenodd" d="M3.1 11.2a.5.5 0 0 1 .4-.2H6a.5.5 0 0 1 0 1H3.75L1.5 15h13l-2.25-3H10a.5.5 0 0 1 0-1h2.5a.5.5 0 0 1 .4.2l3 4a.5.5 0 0 1-.4.8H.5a.5.5 0 0 1-.4-.8l3-4z"/>
+	  <path fill-rule="evenodd" d="M8 1a3 3 0 1 0 0 6 3 3 0 0 0 0-6zM4 4a4 4 0 1 1 4.5 3.969V13.5a.5.5 0 0 1-1 0V7.97A4 4 0 0 1 4 3.999z"/>
+	</svg>
+	</a>
+</div> 
+
+<div class="fixed-btn"> 
+ 
+<a  class="fixed-btn-a" href="index.html"> 
+    <svg   width="25" height="25" fill="currentColor"   viewBox="0 0 16 16">
+  <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L8 2.207l6.646 6.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.707 1.5Z"/>
+  <path d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6Z"/>
+</svg>
+</a>
+	    
+		
+<a  class="fixed-btn-a"  href="pers.html"  target="_blank"> 
+<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor"   viewBox="0 0 16 16">
+  <path d="M8 8a3 3 0 1 0 0-6 3 3 0 0 0 0 6zm2-3a2 2 0 1 1-4 0 2 2 0 0 1 4 0zm4 8c0 1-1 1-1 1H3s-1 0-1-1 1-4 6-4 6 3 6 4zm-1-.004c-.001-.246-.154-.986-.832-1.664C11.516 10.68 10.289 10 8 10c-2.29 0-3.516.68-4.168 1.332-.678.678-.83 1.418-.832 1.664h10z"/>
+</svg>
+</a>
+ 
+<a  class="fixed-btn-a"  href="govpost.html"  target="_blank"> 
+<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25"  fill="currentColor"   viewBox="0 0 16 16">
+  <path fill-rule="evenodd" d="M11 5a3 3 0 1 1-6 0 3 3 0 0 1 6 0ZM8 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4Z"/>
+  <path d="M8.256 14a4.474 4.474 0 0 1-.229-1.004H3c.001-.246.154-.986.832-1.664C4.484 10.68 5.711 10 8 10c.26 0 .507.009.74.025.226-.341.496-.65.804-.918C9.077 9.038 8.564 9 8 9c-5 0-6 3-6 4s1 1 1 1h5.256Z"/>
+  <path fill-rule="evenodd" d="M11.886 9.46c.18-.613 1.048-.613 1.229 0l.043.148a.64.64 0 0 0 .921.382l.136-.074c.561-.306 1.175.308.87.869l-.075.136a.64.64 0 0 0 .382.92l.149.045c.612.18.612 1.048 0 1.229l-.15.043a.64.64 0 0 0-.38.921l.074.136c.305.561-.309 1.175-.87.87l-.136-.075a.64.64 0 0 0-.92.382l-.045.149c-.18.612-1.048.612-1.229 0l-.043-.15a.64.64 0 0 0-.921-.38l-.136.074c-.561.305-1.175-.309-.87-.87l.075-.136a.64.64 0 0 0-.382-.92l-.148-.045c-.613-.18-.613-1.048 0-1.229l.148-.043a.64.64 0 0 0 .382-.921l-.074-.136c-.306-.561.308-1.175.869-.87l.136.075a.64.64 0 0 0 .92-.382l.045-.148ZM14 12.5a1.5 1.5 0 1 1-3 0 1.5 1.5 0 0 1 3 0Z"/>
+</svg>
+</a>
+<a  class="fixed-btn-a"  href="dynasty.html" target="_blank"> 
+<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="currentColor" class="bi bi-people" viewBox="0 0 16 16">
+  <path d="M15 14s1 0 1-1-1-4-5-4-5 3-5 4 1 1 1 1h8zm-7.978-1A.261.261 0 0 1 7 12.996c.001-.264.167-1.03.76-1.72C8.312 10.629 9.282 10 11 10c1.717 0 2.687.63 3.24 1.276.593.69.758 1.457.76 1.72l-.008.002a.274.274 0 0 1-.014.002H7.022zM11 7a2 2 0 1 0 0-4 2 2 0 0 0 0 4zm3-2a3 3 0 1 1-6 0 3 3 0 0 1 6 0zM6.936 9.28a5.88 5.88 0 0 0-1.23-.247A7.35 7.35 0 0 0 5 9c-4 0-5 3-5 4 0 .667.333 1 1 1h4.216A2.238 2.238 0 0 1 5 13c0-1.01.377-2.042 1.09-2.904.243-.294.526-.569.846-.816zM4.92 10A5.493 5.493 0 0 0 4 13H1c0-.26.164-1.03.76-1.724.545-.636 1.492-1.256 3.16-1.275zM1.5 5.5a3 3 0 1 1 6 0 3 3 0 0 1-6 0zm3-2a2 2 0 1 0 0 4 2 2 0 0 0 0-4z"/>
+	
+</svg>
+</a>
+
+<a  class="fixed-btn-a"  href="search.html"  target="_blank"> 
+   <svg xmlns="img/search.svg" width="25" height="25" fill="currentColor"  
+    viewBox="0 0 16 16">
+  <path  d="M11.742 10.344a6.5 6.5 0 1 0-1.397 1.398h-.001c.03.04.062.078.098.115l3.85 3.85a1 1 0 0 0 1.415-1.414l-3.85-3.85a1.007 1.007 0 0 0-.115-.1zM12 6.5a5.5 5.5 0 1 1-11 0 5.5 5.5 0 0 1 11 0z"/>
+</svg>
+</a>
+		
+</div>    
+</div>   
+
+<!-- 模态框 -->
+<div  class="modal"  id="myModal">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+      <!-- 模态框头部 -->
+      <div class="tx_modal_header">
+         内容校正
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <!-- 模态框内容 -->
+      <div class="modal-body">
+        <div class="container mt-3">
+  				 <div class="input-group tx_mb_2">
+					<span class="input-group-text">原文</span>
+					<textarea  cols="8" rows="10"  v-model="paraContent"  class="form-control" placeholder="简介描述"> </textarea>
+				</div> 
+   				<div class="input-group tx_mb_2">
+					<span class="input-group-text">翻译</span>
+					<textarea  cols="8" rows="10"  v-model="paraTrans"  class="form-control" placeholder="简介描述"> </textarea>
+				</div> 
+		</div>
+      </div>
+      <!-- 模态框底部 -->
+	  <div class="modal-footer">
+			<button type="button" class="btn btn-danger" data-bs-dismiss="modal">关闭</button>
+			<button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="saveParag" >保存</button>
+	  </div>	
+    </div>
+  </div>
+</div>   
+</div>  
+   
+</div> 
+  
+   
+<script>
+	
+//document.getElementById("paragEdit").className = "fixed-btn-a-hidden" 
+
+var csss = ['ECLLIPDARK','GRYAYDARK','DARKGREEEE','DARKBA74','GREECC7B5','greea','greee','blueeee']
+var csssIndex = 0
+  
+const app = {
+	data() {
+		return {  
+			 albid:0, 
+			 bookid:0,
+			 paraId:0,
+			 book:{}, 
+			 paraSel:[],
+			 paraContent:'',
+			 paraTrans:'',
+			 paraIdSel:0,
+			 menuBooks:[],
+			 paras:[] ,
+			 targets:[],  
+			 selTargets:[],
+			 selTarget:'',
+			 paragra:"", 
+			 targetObj:{},
+			 targetName:'',  
+			 targetDetail:"", 
+			 showIndex:0,
+			 targetNums:0,
+			 isShowTips:true 
+			 
+		}
+	},
+	mounted () {
+		this.bookid = getUrlParam('bookid')
+		const paraid = getUrlParam('paraid')
+		this.paraId = paraid
+		   
+		const params = {bookid:this.bookid}
+				  
+		axios.get('/selectcontents',{params:params})
+		  .then(response => {
+				this.paras = response.data.reObject["paras"]
+				this.book = response.data.reObject["book"]
+				this.menuBooks = response.data.reObject["menu"]
+				this.albid = this.book.albumId
+				document.title = this.book.chiefAlbum + "-" + this.book.name
+				 
+			})
+		  .catch(function (error) {  
+			 showErrTips(error) 
+		});
+		 
+		if(paraid)
+		{
+			setTimeout(function(){window.location.hash= "#" + paraid;},800); 
+		}
+		
+		 
+		
+		 
+	} ,
+	methods: {
+		checkShowTips(){
+			this.isShowTips = !this.isShowTips
+			if(this.isShowTips)
+			{
+				document.getElementById("flagShowTips").className = "fixed-btn-a"
+				document.getElementById("flagCloseTips").className = "fixed-btn-a-hidden" 
+			}
+			else{
+				document.getElementById("flagShowTips").className = "fixed-btn-a-hidden"
+				document.getElementById("flagCloseTips").className = "fixed-btn-a"
+			}
+		},
+		handleMouseDown(paragraphs) {
+			
+			var obj = event.srcElement ? event.srcElement : event.target;
+			 
+			var objStr = "obj:" + obj
+			if(objStr.indexOf("HTMLDivElement")<0 && objStr.indexOf("HTMLSpanElement")<0)
+			{ 
+				return 
+			}
+			
+			var pid = paragraphs.gid
+			
+			//document.getElementById("paragEdit").className = "fixed-btn-a-hidden" 
+
+			document.getElementById("bookmenulist").className = 'tb_bookmenu_list_hidden'
+		  			
+			document.getElementById("targetshowmsg").style.width = "0px";	
+			this.targetDetail = "" 
+			  
+			let byClassDivs = document.getElementsByClassName('para_sel_border')
+		
+			for (var i=0;i<byClassDivs.length;i++)
+			{ 
+			    byClassDivs[i].className = "para_border"
+			}
+			
+			let  selDiv =  document.getElementById(pid)
+			
+			selDiv.className = "para_sel_border" 
+			this.paraId = pid  
+			  
+		},
+	    handleMouseUp(paragraphs) {
+			
+			var obj = event.srcElement ? event.srcElement : event.target;
+			 
+			var objStr = "obj:" + obj
+			if(objStr.indexOf("HTMLDivElement")<0 && objStr.indexOf("HTMLSpanElement")<0)
+			{
+				return
+			}
+			
+			var pid = paragraphs.gid
+			
+			this.paraSel = paragraphs
+			this.paraIdSel = pid
+			this.paraContent = this.paraSel.content
+			this.paraTrans = this.paraSel.transcation
+			 
+			document.getElementById("bookmenulist").className = 'tb_bookmenu_list_hidden'
+		  
+			 
+			let byClassDivs = document.getElementsByClassName('para_sel_border')
+			
+			for (var i=0;i<byClassDivs.length;i++)
+			{ 
+			    byClassDivs[i].className = "para_border"
+			}
+			
+			let  selDiv =  document.getElementById(pid)
+			
+			selDiv.className = "para_sel_border"	 
+ 
+	    	this.paraId = pid
+	    	 
+	    	this.addReadRecord(pid)  
+	    	
+	    	let selectTargetName = window.getSelection().toString()
+	    	 
+	    	this.selTarget = selectTargetName 
+	    	this.selTargets = []
+	    	this.selTargets.push(selectTargetName)
+	    	if(selectTargetName.length>10)
+	    	{
+				return
+			}
+			
+			if(this.isShowTips){
+				this.queryTargets( )  
+			}
+	    	
+	    	 
+	    },
+		saveParag() {
+			console.log("paraIdSel:" + this.paraIdSel)
+			
+			const params = {  
+				content : this.paraContent,
+				gid:this.paraIdSel, 
+				transcation:this.paraTrans
+			}
+			  		
+	        axios
+			  .post('/emendParagraphs', params)
+			  .then(
+			  function (response) {
+				  showOKTips(  "修改成功"  )
+				   
+				  document.getElementById("cont" + params.gid).innerHTML = params.content; 
+				  document.getElementById("trans" + params.gid).innerHTML = params.transcation;
+			  }  
+			  )
+			  .catch(function (error) { // 请求失败处理
+				  showErrTips( "修改失败！" + error)
+			}); 
+			
+		},
+	    showMsg(event)
+	    {
+			if(!this.isShowTips){
+				return
+			} 
+			 
+			let selectTargetName = window.getSelection().toString()
+	    	 
+	    	//this.targetName = targetName 
+	    	if(selectTargetName.length>10)
+	    	{
+				return
+			}
+			if(selectTargetName.length<2)
+	    	{
+				return
+			}
+			
+			this.selTarget = selectTargetName 
+	    	this.selTargets = []
+	    	this.selTargets.push(selectTargetName)
+	    	
+		 	var oMsg = document.getElementById("targetshowmsg");
+	    	oMsg.className = "tb_targettips"	
+	    	
+	    	var e = event || window.event;
+            var scrollx = document.documentElement.scrollLeft || document.body.scrollTop;
+            var scrolly= document.documentElement.scrollTop || document.body.scrollTop;
+            var x = e.pageX || e.clientX + scrollx;
+            var y = e.pageY || e.clientY + scrolly;
+ 
+
+	    	this.xpoint = x 
+	    	this.ypoint = y
+	    	
+	    	 
+	    	eleftP = x - 180
+	    	etopP = y + 20
+	    	 
+	    	
+	    	oMsg.style['left'] =  eleftP + 'px';
+            oMsg.style['top'] =  etopP + 'px';
+		},
+	    addTarget(){
+			 
+			const params = {  
+				targetName : this.selTarget ,
+				paragId:this.paraId 
+			}
+			  		
+	        axios
+			  .post('/addTargetFromGrap', params)
+			  .then(
+			  function (response) {
+				  showOKTips(params.targetName + " 添加成功"  )
+			  }  
+			  )
+			  .catch(function (error) { // 请求失败处理
+				  showErrTips(params.targetName + "：新增失败！" + error)
+			}); 
+			this.hiddenMenu();
+		} , 
+	    addReadRecord(gid)
+		{
+			const params = {  
+				bid : this.bookid,
+				gid : gid
+			}
+			 
+			
+             axios
+			  .post('/addreadrecord', params)
+			  .then(
+			  function (response) {
+				   
+			  }  
+			  )
+			  .catch(function (error) { // 请求失败处理
+				  showErrTips(params.name + "：新增失败！")
+			});    
+		},  
+	    queryTargets(){ 
+			this.targets = []
+			this.targetDetail = "" 
+			this.showIndex = 0
+			this.targetNums = 0
+			
+			targetName = this.selTarget
+			if(targetName==null||targetName=='')
+	    	{
+				//document.getElementById("targetshowmsg").style.width = "0px";
+				this.targets = []
+				return
+			}
+			 
+			const params = {
+				name:targetName,
+				graphId:this.paraId,
+				bgtime:this.book.bgtime,
+				endtime:this.book.endtime 
+				
+			 }	  
+			
+			axios.get('/selectShowTargets',{params:params})
+		  	.then(response => {
+			  	this.targets = response.data.reObject   
+			   	
+			  	  
+				if(this.targets.length>0  )
+			  	{
+					this.targetObj = this.targets[0]
+					this.targetNums = this.targets.length
+					 
+			    }
+			    
+			    
+			    tts = response.data.reportData["tarnames"]  
+			  	
+			  	if(tts == undefined || tts.length <= 0)
+			  	{
+					 this.selTargets = []
+					 this.selTargets.push(targetName) 
+				}
+				else{
+					this.selTargets = tts
+					if(this.selTargets.indexOf(targetName)<0)
+					{
+						this.selTargets.unshift(targetName)  
+					} 
+				} 
+				 
+			})
+		  	.catch(function (error) {  
+			 	 
+			}); 
+			
+			document.getElementById("targetshowmsg").style.width = "360px" ; 
+			 
+			 
+		}, 
+		nexttar(){ 
+			if(this.showIndex == this.targets.length-1)
+			{
+				return
+			}
+			
+			
+			this.showIndex = this.showIndex+1
+			
+			this.targetObj = this.targets[this.showIndex]
+			 
+		},
+		uptar(){ 
+			if(this.showIndex == 0)
+			{
+				return
+			}
+			this.showIndex = this.showIndex - 1
+			this.targetObj = this.targets[this.showIndex]
+			 
+		},
+		showW()
+		{  
+			showTarget(this.targetObj)
+			
+		},
+		newTarget()
+		{
+			
+			let per = this.targetObj
+			 
+			showTarget(per)
+		},
+		clearSel(){
+		  
+			let byClassDivs = document.getElementsByClassName('para_sel_border')
+			
+			for (var i=0;i<byClassDivs.length;i++)
+			{ 
+			    byClassDivs[i].className = "para_border"
+			}  
+			
+						  
+		}  ,
+		showTrans(type)
+		{
+			//0=  原   1=段  2=译  
+			let byClassDivs = document.getElementsByClassName('bk_transcation')
+			
+			for (var i=0;i<byClassDivs.length;i++)
+			{  
+			    byClassDivs[i].style.height = "auto";
+			}
+			byClassDivs = document.getElementsByClassName('bk_onecontent')
+			
+			for (var i=0;i<byClassDivs.length;i++)
+			{  
+			    byClassDivs[i].style.height = "auto";
+			}
+						   
+			clsName = 'bk_transcation'
+			clsValue = ""
+			if(type==0)
+			{
+				clsName = 'bk_transcation'
+				clsValue = "0px";
+				document.getElementById("showy").style.color = "blue";
+				document.getElementById("showd").style.color = "black";
+				document.getElementById("showt").style.color = "black";
+			}
+			if(type==1)
+			{
+				clsName = 'bk_transcation'
+				clsValue = "auto";
+				document.getElementById("showy").style.color = "black";
+				document.getElementById("showd").style.color = "blue";
+				document.getElementById("showt").style.color = "black";
+			}
+			if(type==2)
+			{
+				clsName = 'bk_onecontent'
+				clsValue =  "0px";
+				document.getElementById("showy").style.color = "black";
+				document.getElementById("showd").style.color = "black";
+				document.getElementById("showt").style.color = "blue";
+			}
+			 
+			
+		 
+			byClassDivs = document.getElementsByClassName(clsName)
+			
+			for (var i=0;i<byClassDivs.length;i++)
+			{  
+			    byClassDivs[i].style.height = clsValue;
+			}
+		},
+		changeTheme(){
+			
+			csssIndex = csssIndex + 1 
+			
+			if(csssIndex>=csss.length)
+			{
+				csssIndex = 0
+			}
+			 
+			document.body.className = csss[csssIndex]
+			 
+			
+		}, 
+		showconntent(bookid)
+		{ 
+			window.open('bookcontent.html?bookid=' + bookid  ,'_self') 
+		} ,
+		showBooksMenu()
+		{
+			document.getElementById("bookmenulist").className = 'tb_bookmenu_list' 
+		},
+		hiddenMenu()
+		{
+			document.getElementById("bookmenulist").className = 'tb_bookmenu_list_hidden' 
+		 	document.getElementById("targetshowmsg").className = "tb_targettips_hidden"
+		 	this.paragra = []
+			this.paraIdSel = 0
+
+		},
+		cutContent(content,n)
+		{
+			lenn = content.length  
+			if(lenn<n)
+			{
+				return content
+			}  
+			
+			tipHtml  =   content.substring(0,n-5)  
+			 
+			return   tipHtml
+		},
+		gotoTop()
+		{ 
+			window.location.hash= "#" + this.paras[0].gid ; 
+		}
+		
+	}
+	 
+}
+ 
+vm = Vue.createApp(app).mount('#app')
+
+
+</script>
+ 
+</body>
+</html>

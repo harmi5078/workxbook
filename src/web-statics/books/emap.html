@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html style="height: 100%">
+<head>
+ <meta charset="utf-8">
+ <script src="../js/axios.min.js"></script>
+</head>
+<body  style="height: 100%; background-color: bisque;"> 
+<div style="width: 95%;"> 
+	<input style="width: 100%;height:30px;" 
+	id="range" type="range" value="5" 
+	onchange="changeV()" max="1000" oninput="densityInput(event)"
+	 onpropertychange="OnPropChanged(event)"> 
+</div>
+ 
+<div id="container" style="height: 100%;"></div>
+
+
+<script src="../js/echarts.min.js"></script> 
+<script  src="../js/chain.js"></script> 
+<script  src="js_emap.js"></script> 
+ 
+<script>
+	
+createMap("container")  
+
+function refreshPers22()
+{
+	
+	var pers1 = [{ 
+	    "name": "李大明刘明",
+	    "value": [
+	        111.15,
+	        21.89
+	    ],
+	    "symbolSize":50 
+	}] 
+	
+	refreshPers(pers1) 
+}
+  
+ const range = document.getElementById('range');
+
+function changeV() {
+  console.log("changeV-----" + range.value);
+  
+  const params = {   
+		 year:range.value 
+ 	}	 
+ 	
+ 	axios.get('/selectpersonsbyyear' ,{params:params})
+	  .then(response => {
+		   var persons = response.data.reObject  
+		   
+		   showPersonData(persons)
+		    
+		  	
+		})
+	  .catch(function (error) {  
+		 showErrTips(error) 
+		});
+  
+}
+
+function densityInput (event) {
+  console.log("densityInput-----" + range.value);
+}
+  
+  // Internet Explorer 
+function OnPropChanged (event) {
+  console.log("OnPropChanged-----" +range.value);
+} 
+</script>
+</body> 
+</html> 

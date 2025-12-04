@@ -1,0 +1,204 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>嗖</title>  
+<link href="../bootstrap/5.1.1/bootstrap.min.css" rel="stylesheet">
+<script src="../bootstrap/5.1.1/bootstrap.bundle.min.js"></script> 
+<script src="../js/vue.global.js"></script>
+<script src="../js/axios.min.js"></script>
+<link href="css_book.css" rel="stylesheet"> 
+<script src="js_book.js"></script>
+
+</head>
+<body>
+<div id = "app"   > 
+    
+<div class="row" > 
+		<div style="width:66%" class="bkcontent">
+		 	<div style=" margin-top:20px;margin-bottom:15px;  "  >
+				<div class="row" > 
+					<div  style="width:75%">   
+						<p><b>{{book.chiefAlbum}} - {{book.name}} </b></p>
+					</div>
+					<div   style="width:11%">   
+						{{paranav}} 
+					</div>
+					<div @click="toPre" style="width:7%">   
+						<img src="img/left.svg"  width="22" height="22" >
+					</div>
+					<div  @click="toNext"  style="width:7%">   
+						 <img src="img/right.svg"  width="22" height="22" >
+					</div>
+					
+				</div>
+				<div  >  
+			      <div   @mouseup="handleMouseUp"  >
+					  <span style=" margin-left:2rem" v-html="paragra.content"></span>
+					  
+				  </div> 
+			       
+			  	</div>
+		  	</div>
+        </div>
+        
+        <div  style="width:30%" class="bktartool"> 
+		 	<div style="margin-top:12px"> 
+				<div  > 
+					 <div class="input-group "   >  
+					  	<input type="text" v-model="tarname"  class="form-control" placeholder="对象名称">
+					</div>
+					<div style="margin-top:3px">  
+					  	  <textarea placeholder="对象描述"  v-model="tardesc"   class="form-control"  style="min-height:120px" ></textarea>
+					</div>
+					<div class="input-group " style="margin-top:3px"> 
+						 <span   class="input-group-text" style="margin-right:8px">
+							 对象 
+						 </span > 
+						 	<select class="form-select" v-model="target"   >
+							<option v-for="tar  in targets" :value="tar.id">
+							  {{ tar.name }}  
+							</option>
+						</select> 
+					</div>
+			  	</div> 
+		  	</div> 	 
+				
+			<div class="row" style="margin-top:3px" >  
+				<div style="width:45%"  >
+					<button type="button" class="btn btn-primary" @click="toSaveRelation">增加关联</button> 
+				</div>
+				<div  style="width:35%"  >
+					<button type="button" class="btn btn-primary" @click="toSaveRelation">增加关联</button> 
+				</div>
+			</div>
+			
+			 <div  class="row" style="margin-top:3px" >
+				 <div v-for="tarr in reltargets"  style="width:20%;color:white">
+				      {{ tarr.name }}
+				 </div>	   
+			 </div>    
+			 
+			</div> 
+            
+               
+        </div>
+	 
+
+</div>
+
+
+</div> 
+
+   
+<script>
+
+
+  
+const app = {
+	data() {
+		return {
+			 paras:[] ,
+			 book:{},
+			 targets:[],
+			 paraId:0,
+			 paragra:{},
+			 index:0,
+			 paranav:"",
+			 reltargets:[]
+		}
+	}, 
+	mounted () {
+		const bookid = getUrlParam('bookid')
+		 
+		const params = {bookid:bookid}
+				  
+		axios.get('/selectcontents',{params:params})
+		  .then(response => {
+			  this.paras = response.data.reObject["paras"]
+			  this.book = response.data.reObject["book"]
+			  this.paragra = this.paras[0]
+			  this.paranav = "1/" + this.paras.length
+			  this.queryTargets(this.paragra.gid) 
+			})
+		  .catch(function (error) {  
+			 showErrTips(error) 
+		});
+	} ,
+	methods: { 
+	    toSaveRelation(){
+			paraId = this.paraId 
+			if (paraId<=0)
+			{ 
+				return;
+			}
+				
+			const params = {targetName:targetName}
+		} ,
+		toNext()
+		{
+			if(this.index<this.paras.length-1)
+			{
+				this.index++
+			}
+			this.paragra = this.paras[this.index]
+			this.paranav = (this.index+1) + "/" + this.paras.length
+			this.queryTargets(this.paragra.gid)
+		},
+		toPre()
+		{
+			if(this.index>0)
+			{
+				this.index --
+			}
+			
+			this.paragra = this.paras[this.index]
+			this.paranav = (this.index+1) + "/" + this.paras.length
+			 
+			this.queryTargets(this.paragra.gid)
+			
+		},
+		handleMouseUp( ) {
+			 
+			let targetName = window.getSelection().toString() 
+			
+			if(targetName.length==0)
+			{
+				return
+			}
+			
+			this.tarname = targetName
+	    	const params = {targetName:targetName}
+				  
+			axios.get('/selectTargets',{params:params})
+		  	.then(response => {
+			  	this.targets = response.data.reObject   
+			  	this.target = this.targets[0].id
+			})
+		  	.catch(function (error) {  
+			 	 
+			});   
+	    },
+	    queryTargets(gid)
+	    {
+			 
+			const params = {gid:gid}
+				  
+			axios.get('/selectTargetsByParag',{params:params})
+		  	.then(response => {
+			  	this.reltargets = response.data.reObject   
+			})
+		  	.catch(function (error) {  
+			 	 
+			}); 
+		}
+	}
+	 
+}
+ 
+vm = Vue.createApp(app).mount('#app')
+ 
+</script>
+ 
+</body>
+</html>

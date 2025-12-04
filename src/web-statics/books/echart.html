@@ -1,0 +1,636 @@
+<!DOCTYPE html>
+<html   class="ECLLIPDARK" style="height: 100%; ">
+<head>
+<meta charset="utf-8">
+<title>嗖</title>  
+<link href="../bootstrap/5.1.1/bootstrap.min.css" rel="stylesheet">
+<script src="../bootstrap/5.1.1/bootstrap.bundle.min.js"></script> 
+<script src="../js/axios.min.js"></script>
+<script src="../js/vue.global.js"></script>
+<link href="css_book.css" rel="stylesheet">  
+<link href="css_modal.css" rel="stylesheet"> 
+<script src="js_book.js"></script> 
+<script src="js_echart.js"></script> 
+<script src="../js/echarts.min.js"></script>
+ 
+ 
+</head>
+<body style="height: 100%; ">
+<div id = "app"  > 
+ 
+<div class="bk_top_toolbar bk_onerow" style="width: 100% ;height:50px; background-color: #668894; " >
+	<div style="width:50%; height:50px;position: relative;  "> 
+		<div style="height:30px;position: absolute;top: 0;bottom: 0;margin: auto; "> 
+			 <a  class="fixed-btn-a" style="cursor: pointer;" data-bs-toggle="modal" data-bs-target="#filtermodal" >  
+			    <svg xmlns="http://www.w3.org/2000/svg"
+			     width="2em" height="2em" viewBox="0 0 24 24"><path fill="currentColor" d="M11 12q-1.65 0-2.825-1.175T7 8t1.175-2.825T11 4t2.825 1.175T15 8t-1.175 2.825T11 12m0-2q.825 0 1.413-.587T13 8t-.587-1.412T11 6t-1.412.588T9 8t.588 1.413T11 10m10.4 12.8l-2.5-2.5q-.525.3-1.125.5T16.5 21q-1.875 0-3.187-1.312T12 16.5t1.313-3.187T16.5 12t3.188 1.313T21 16.5q0 .675-.2 1.275t-.5 1.125l2.5 2.5q.275.275.275.7t-.275.7t-.7.275t-.7-.275M16.5 19q1.05 0 1.775-.725T19 16.5t-.725-1.775T16.5 14t-1.775.725T14 16.5t.725 1.775T16.5 19M3 18v-.775q0-.85.425-1.575t1.175-1.1q1.05-.55 2.338-.962t2.637-.538q.425-.05.725.25t.3.725t-.3.738t-.725.362q-1.425.175-2.4.525t-1.65.7q-.25.125-.387.363T5 17.225V18h4.6q.425 0 .713.288T10.6 19t-.287.713T9.6 20H5q-.825 0-1.412-.587T3 18m7.175 0"/></svg>
+			</a>
+		</div> 
+		 
+	</div> 
+	<div style="width:50%;height:50px;position: relative; display: flex;display: flex;
+    flex-direction: row-reverse; "> 
+		<div style="height:30px;position: absolute;top: 0;bottom: 0;margin: auto;padding-right:10px ; "> 
+			 <a  class="fixed-btn-a" href="index.html"> 
+    <svg   width="25" height="25" fill="currentColor"   viewBox="0 0 16 16">
+  <path d="M8.707 1.5a1 1 0 0 0-1.414 0L.646 8.146a.5.5 0 0 0 .708.708L8 2.207l6.646 6.647a.5.5 0 0 0 .708-.708L13 5.793V2.5a.5.5 0 0 0-.5-.5h-1a.5.5 0 0 0-.5.5v1.293L8.707 1.5Z"/>
+  <path d="m8 3.293 6 6V13.5a1.5 1.5 0 0 1-1.5 1.5h-9A1.5 1.5 0 0 1 2 13.5V9.293l6-6Z"/>
+</svg>
+</a>
+		</div> 
+		 
+	</div> 
+	 
+</div >	       
+ 
+  	 
+ <div id="graph"  style="top:50px;  height: 1000px;width: 100%;  ">
+	 
+	 
+ </div>
+ 
+<!-- 模态框 111-->
+ <div class="bk_right_toolbar"  id="rightBar">
+	<div class="container ">
+		<input type="hidden" id="tarid"   class="form-control" >
+		<div class="input-group tx_mb_2"  style=" border-bottom:1px solid rgba(0, 0, 0, .2) ;"  >
+			<div style="cursor: pointer;" onclick="hiddenBar('rightBar')" >
+				<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="white" class="bi bi-x" viewBox="0 0 16 16">
+				  <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+				</svg>
+			</div>
+		</div> 
+		
+		<div class="input-group tx_mb_2">
+			<span class="input-group-text">名称</span>
+			<input type="text" id="tarname"   class="form-control" placeholder="名称">
+		</div> 
+		<div class="input-group tx_mb_2">
+			<span class="input-group-text">年份</span>
+			<input type="text" id="startYear"  class="form-control" v-model="startYear"  @change='inputyear' placeholder="开始年份"> 
+			 <span class="input-group-text">-</span>
+			<input type="text" id="endYear" class="form-control" v-model="endYear"  @change='inputyear' placeholder="结束年份">
+		</div> 
+		 
+		<div class="input-group tx_mb_2">
+			<span class="input-group-text">国家</span>
+			 <select class="form-select" v-model="country" id="country" >
+				<option v-for="cty in countrys" :value="cty.id">
+				  {{ cty.name }}  ( {{ cty.bgTime }} 至  {{ cty.endTime }})   
+				</option>
+			</select> 
+		</div> 
+		<div class="input-group tx_mb_2 dropdown">
+			<span class="input-group-text">地址</span>
+			 
+			   <input type="text"  data-bs-toggle="dropdown" 
+			   class="form-control" placeholder="地址" 
+			   id="address" v-model="address" @input="inputAddr()">
+			    
+			     <ul class="dropdown-menu">
+			      <li v-for="addr in addresses">
+					  <div class="dropdown-item" @click="setAddress(addr)">{{addr.name}}</div>
+			      </li>
+			      
+			    </ul> 
+		</div> 
+	  
+		
+	   
+		<div class="input-group tx_mb_2">
+			<span class="input-group-text">描述</span>
+			<textarea  cols="8" rows="10" id="detail"   class="form-control" placeholder="简介描述">{{tardetails}}</textarea>
+		</div> 
+		 
+		 <!-- div class="input-group tx_mb_2">
+			<span class="input-group-text">网址</span>
+			<input type="text" id="neturl"  class="form-control" placeholder="网络信息地址">
+		</div --> 
+	   <div class="input-group bk_row"  > 
+		   <div style="width: 20%;">
+				<button type="button" class="btn btn-primary" 
+			 @click="toSaveTarget" >保存</button> 
+			</div>
+			<div  style="width:20%; padding-right: 10px;">
+				<button type="button" class="btn btn-primary" 
+				 @click="reloadData" >
+				 <svg xmlns="http://www.w3.org/2000/svg" 
+				 width="1.3em" height="1.3em" viewBox="0 0 24 24"><g fill="white" fill-rule="evenodd"><path d="m12.594 23.258l-.012.002l-.071.035l-.02.004l-.014-.004l-.071-.036q-.016-.004-.024.006l-.004.01l-.017.428l.005.02l.01.013l.104.074l.015.004l.012-.004l.104-.074l.012-.016l.004-.017l-.017-.427q-.004-.016-.016-.018m.264-.113l-.014.002l-.184.093l-.01.01l-.003.011l.018.43l.005.012l.008.008l.201.092q.019.005.029-.008l.004-.014l-.034-.614q-.005-.019-.02-.022m-.715.002a.02.02 0 0 0-.027.006l-.006.014l-.034.614q.001.018.017.024l.015-.002l.201-.093l.01-.008l.003-.011l.018-.43l-.003-.012l-.01-.01z"/><path fill="white" d="M14 2a3 3 0 0 1 .054 6l-.218.653A4.5 4.5 0 0 1 15.89 11.5h1.319a2.5 2.5 0 1 1 0 2h-1.32a4.5 4.5 0 0 1-1.006 1.968l.704.704a2.5 2.5 0 1 1-1.414 1.414l-.934-.934A4.5 4.5 0 0 1 11.5 17a4.5 4.5 0 0 1-1.982-.46l-.871 1.046a3 3 0 1 1-1.478-1.35l.794-.954A4.48 4.48 0 0 1 7 12.5c0-.735.176-1.428.488-2.041l-.868-.724A2.5 2.5 0 1 1 7.9 8.2l.87.724a4.48 4.48 0 0 1 3.169-.902l.218-.654A3 3 0 0 1 14 2M6 18a1 1 0 1 0 0 2a1 1 0 0 0 0-2m10.5 0a.5.5 0 1 0 0 1a.5.5 0 0 0 0-1m-5-8a2.5 2.5 0 1 0 0 5a2.5 2.5 0 0 0 0-5m8 2a.5.5 0 1 0 0 1a.5.5 0 0 0 0-1m-14-5a.5.5 0 1 0 0 1a.5.5 0 0 0 0-1M14 4a1 1 0 1 0 0 2a1 1 0 0 0 0-2"/>
+				 </g></svg>
+				 </button> 
+			</div>
+			
+			 <div style="width: 40%;">
+				<button type="button" class="btn btn-primary" 
+			 @click="showbaike" >查询百科</button> 
+			</div>
+		</div>
+		
+		
+  
+					
+	</div>
+        
+</div>
+<!-- 模态框 111-->
+  
+<!-- 模态框2 -->
+<div class="bk_left_toolbar" style="overflow-y:auto;" id="leftBar">
+  	<div class="container ">
+		<div class="bk_leftbar_header" style=" border-bottom:1px solid rgba(0, 0, 0, .2) ;"  >
+			<div style="cursor: pointer;" onclick="hiddenBar('leftBar')" >
+				<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="white" class="bi bi-x" viewBox="0 0 16 16">
+				  <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+				</svg>
+			</div>
+		</div> 
+		 
+		 <div  class="bk_content_box  "  >
+			 <div class=" " style="overflow:auto;color: aliceblue;" id="linktargets"> 	  
+					    
+		  	</div> 
+		 
+			<div class=" " style="overflow-y:auto;" id="linkcontents"> 	  
+					    
+		  	</div> 
+		 
+		</div>  
+	</div> 	 			
+			 
+</div> <!-- 模态框2 -->   
+
+
+<!-- 模态框3 -->
+<div class="bk_left_toolbar" style="overflow-y:auto" id="leftBar2">
+  	<div class="container ">
+		<div class="bk_leftbar_header" style=" border-bottom:1px solid rgba(0, 0, 0, .2) ;"  >
+			<div style="cursor: pointer;" onclick="hiddenBar('leftBar2')" >
+				<svg xmlns="http://www.w3.org/2000/svg" width="25" height="25" fill="white" class="bi bi-x" viewBox="0 0 16 16">
+				  <path d="M4.646 4.646a.5.5 0 0 1 .708 0L8 7.293l2.646-2.647a.5.5 0 0 1 .708.708L8.707 8l2.647 2.646a.5.5 0 0 1-.708.708L8 8.707l-2.646 2.647a.5.5 0 0 1-.708-.708L7.293 8 4.646 5.354a.5.5 0 0 1 0-.708z"/>
+				</svg>
+			</div>
+		</div> 
+		 
+		 <div  class="bk_content_box  "  >
+			 
+		 
+			<div class=" " style="overflow-y:auto;color: var(--bk_box_color);" > 	  
+				 
+					{{baikeSummary}}
+				    
+		  	</div> 
+		 
+		</div>  
+	</div> 	 			
+			 
+</div> <!-- 模态框3 -->   
+
+<!-- 过滤对话框 -->
+<!-- 模态框 -->
+<div class="modal" id="filtermodal">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content"> 
+      <!-- 模态框头部 -->
+      <div class="tx_modal_header"> 
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <!-- 模态框内容 -->
+      <div class="modal-body bk_onerow" style="overflow-y:auto" > 
+		<div class="bk_onerow" style="width: 86.5%;padding-left: 20px;padding-bottom: 20px;"> 
+			 <input type="text" 
+				@change="reloadPerson()"
+				v-model="ftarname"  
+				class="tb_input_text" placeholder="人物信息关键词"
+				style="font-size: 16px;">
+		</div>    
+  		<div class="bk_onerow" style="width: 99.5%;"> 
+			<div v-for="per  in persons" class="bk_6cols">
+				 <div style="cursor: pointer;" data-bs-dismiss="modal" @click="refreshData(per.pid)">
+					 {{per.name}}
+				 </div>
+			</div>  
+		</div>  
+      </div>
+    </div>
+  </div>
+</div>  
+<!-- 过滤对话框 end-->
+ 
+</div> 
+ <!-- app -->	
+
+<script>
+var tarList = [] 
+var linkList = []
+var catList = []
+const app = {
+	data() {
+		return {  
+			 dynastys:[],
+			 countrys:[],
+			 addresses:[],
+			 linkparas:[] ,
+			 baikeSummary:'',
+			 baiked:0,
+			 persons:[],
+			 target:{},
+			 tarid:0,
+			 tarname:'',
+			 address:'',
+			 addrId:0,
+			 dynasty:[], 
+			 country:0,
+			 startYear:'',
+			 endYear:'',
+			 tardetails:'',
+			 neturl:''	,
+			 minYear:-1000,
+			 maxYear:1000	,
+			 ftarname:''	 
+		}
+	},
+	mounted () {
+		 
+		const params2  = {
+				bgTime:-1000,
+				endTime:2000,
+			}
+			
+		axios.get('/selectdynasty' ,{params:params2} )
+		  .then(response => {
+			  this.dynastys = response.data.reObject  
+			  this.dynasty = this.dynastys[8] 
+			   
+			})
+		  .catch(function (error) {  
+			 showErrTips("朝代信息：" + error) 
+		});
+		
+		 
+		this.refreshAddress();
+		
+		var thisEchats = createEcharts("graph");
+ 
+		thisEchats.on('click', function (params) {
+ 
+		    if(params.dataType =="node")
+		    {
+				//console.log( "id " +  params.data.id );
+				//app.data.targid = params.data.id
+				//app.methods.refreshData(params.data.id);
+				//console.log( "this.targid " +  params.data.id );
+				 
+				//refreshData(params.data.id);
+				 
+				//var targetModal = document.getElementById("nodeModal");
+				//targetModal.style.display = "block";
+				
+				app.methods.targetDetail(params.data.id)
+				
+				app.methods.targetLinks(params.data)
+				 
+				app.methods.showBar('rightBar')
+				 
+				 
+			} else if(params.dataType =="edge")
+		    {
+				app.methods.linksDetail(params.data)
+				app.methods.showBar('leftBar') 
+				 
+			} 
+		});
+		
+		this.refreshData(18); 
+		this.loadPerson("");
+		
+		
+	} ,
+	methods: { 
+		reloadPerson()
+		{
+			this.loadPerson(this.ftarname)
+		},
+		loadPerson(pname)
+		{
+			 
+			const params = {   
+				 name:pname  
+		 	}	 
+		 	
+		 	axios.get('/selectpersons' ,{params:params})
+			  .then(response => {
+				  this.persons = response.data.reObject  
+				})
+			  .catch(function (error) {  
+				  
+				});
+		},
+		toSaveTarget()
+		{
+			//pubdata(tarid,tarList,linkList,catList) 
+			 
+			var tarid = document.getElementById("tarid").value
+			var name =  document.getElementById("tarname").value
+			var dynasty = this.dynasty
+			var country = this.country
+			var address = document.getElementById("address").value
+			var startYear = document.getElementById("startYear").value
+			var endYear = document.getElementById("endYear").value
+			var detail = document.getElementById("detail").value
+			  
+			
+			const params = {
+				id:tarid,
+				name:name,
+				dynasty:dynasty.id,
+				country:country,
+				address:address,
+				bgtime:startYear,
+				endtime:endYear,
+				detail:detail ,
+				addrId:this.addrId
+			}
+			 
+            axios
+			  .post('/savetarget', params)
+			  .then(
+			  function (response) {
+				  showOKTips(params.name + "：修改成功！")
+				  this.refreshAddress();
+				  //this.hiddenBar("rightBar")
+				  
+			  }  
+			  )
+			  .catch(function (error) { // 请求失败处理
+				  showErrTips(params.name + "：修改失败！")
+			});   
+			 
+			
+		} ,
+		targetLinks(target)
+		{
+			const params = {tarid:target.id}
+			
+			document.getElementById("linktargets").innerText = target.name 
+			
+				  
+			axios.get('/tardetail',{params:params})
+			  .then(response => { 
+				  this.showLinksContent(response.data.reObject["paras"]) 
+				})
+			  .catch(function (error) {  
+				 showErrTips(error) 
+			});
+		},
+		targetDetail(tarid)
+		{
+			document.getElementById("tarid").value = tarid
+				   
+			const params = {tarid:tarid}
+			
+			axios.get('/onetarget',{params:params})
+			  .then(response => { 
+				  
+					app.target = response.data.reObject 
+					  
+					document.getElementById("tarname").value = response.data.reObject.name
+					document.getElementById("address").value = response.data.reObject.address
+					document.getElementById("startYear").value = response.data.reObject.bgtime
+					document.getElementById("endYear").value = response.data.reObject.endtime
+					document.getElementById("detail").value = response.data.reObject.detail
+					document.getElementById("country").value   = response.data.reObject.country
+					//document.getElementById("dynasty").value = response.data.reObject.dynasty
+				 
+				})
+			  .catch(function (error) {  
+				 showErrTips(error) 
+			});
+		},
+		showbaike()
+		{
+			tarid = document.getElementById("tarid").value  
+			console.log(tarid)
+			
+			this.baike = {} 
+			this.baiked = 0
+			
+			const params = {tarid:tarid}
+			
+			axios.get('/selectbaike',{params:params})
+			  .then(response => { 
+				     if(response.data.reCode=="1")
+				     {
+						 this.baikeSummary = response.data.reObject.detail
+						 this.baiked = 1 
+						 
+						 this.showBaikeBar('leftBar2')
+					 }
+					 
+				})
+			  .catch(function (error) {  
+				 showErrTips(error) 
+			});
+		},
+		linksDetail( line)
+		{
+			console.log(line)
+			var source = line.source
+			var target = line.target
+			
+			const params = {
+				source: line.source,
+			  	target:line.target 
+			}
+			
+			document.getElementById("linktargets").innerText = line.sourceName + " -- " + line.targetName
+					 
+			axios.get('/tar2links',{params:params})
+			  .then(response => {  
+					app.data.linkparas = response.data.reObject 
+					this.showLinksContent(response.data.reObject) 
+					 
+				})
+			  .catch(function (error) {  
+				 showErrTips(error) 
+			});
+		},
+		showLinksContent(paras)
+		{
+			this.linkparas = paras
+			
+			var htmls = ""
+					
+			for(i=0;i< paras.length;i++   )
+			{
+				htmls = htmls + " <div class=\"bk_onecontent\"   style=\"font-size:15px;margin-right:0.1rem;margin-left:0.3rem\"  > " +
+	        		"<span class=\"bktitle_g\"  onclick=\"showconntent(" + paras[i].bid +","+ paras[i].gid + ")\"  >" + paras[i].chiefAlbum + "." + paras[i].volume + "."+ paras[i].bookName + "  </span>" +
+	        		" <span >&emsp;" + paras[i].content + "</span> " + 
+		  			" </div> "
+				console.log()
+			}
+			
+			document.getElementById("linkcontents").innerHTML   = htmls
+					
+			
+		},
+		reloadData()
+		{
+			var tarid = document.getElementById("tarid").value
+			this.refreshData(tarid)
+		},
+		refreshData(tarid)
+		{ 
+			  
+			const params = {startTarid:tarid}
+			   
+			axios.get('/perschartlink',{params:params})
+			  .then(response => {
+				   
+				 
+				  	tarList = response.data.reObject["targets"] 
+					linkList = response.data.reObject["links"]
+					catList = response.data.reObject["categories"]
+				    
+				  	pubdata(tarid,tarList,linkList,catList) 
+				    
+				})
+			  .catch(function (error) {  
+				 showErrTips(error) 
+			}); 
+			
+			this.targetDetail(tarid);
+		},
+		hiddenBar(divId)
+		{ 
+			var modal = document.getElementById(divId);
+			modal.style.width = "0px"; 
+			 
+		},
+		showBar(divId)
+		{  
+			var modal = document.getElementById(divId);
+			modal.style.width = "23.6%";  
+		 
+		},
+		showBaikeBar(divId)
+		{  
+			var modal = document.getElementById(divId);
+			modal.style.width = "73.6%";  
+		 
+		},
+		setAddress(addr)
+		{
+			console.log("addr.aid:" +addr.addrId)
+			this.address = addr.name
+			this.addrId = addr.addrId
+		} ,
+		refreshAddress()
+		{
+			
+			const params2  = {
+				bgTime:-1000,
+				endTime:2000,
+			}
+			
+			axios.get('/selectaddress' ,{params:params2} )
+			  .then(response => {
+				  this.addresses = response.data.reObject   
+				})
+			  .catch(function (error) {  
+				 showErrTips("地址信息：" + error) 
+			});
+		},
+		selectTimes( )
+		{
+		 
+			var bgTime = this.dynasty.bgTime
+			var endTime = this.dynasty.endTime
+			
+			const params2  = {
+				bgTime:bgTime,
+				endTime:endTime 
+			}
+			
+			axios.get('/selectcountry' ,{params:params2} )
+			  .then(response => {
+				  this.countrys = response.data.reObject   
+				  this.country = this.countrys[0].id
+				})
+			  .catch(function (error) {  
+				 showErrTips("朝代信息：" + error) 
+			});
+			
+			
+		},
+		inputAddr()
+		{
+			var address = document.getElementById("address").value
+			const params2  = {
+				bgTime:-1000,
+				endTime:2000,
+				name:address
+			}
+			
+			axios.get('/selectaddress' ,{params:params2} )
+			  .then(response => {
+				  this.addresses = response.data.reObject   
+				})
+			  .catch(function (error) {  
+				 showErrTips("地址信息：" + error) 
+			});
+		} ,
+		inputyear()
+		{
+			this.loadNationDynasty()
+		},
+		loadNationDynasty()
+		{ 
+			 
+			var bgYear = document.getElementById("startYear").value;
+			var endYear = document.getElementById("endYear").value;
+			
+			const params   = {
+				bgTime:-50 + Number(bgYear ),
+				endTime:50 + Number(endYear) 
+			}
+			
+			axios.get('/selectcountry' ,{params:params} )
+			  .then(response => {
+					var countrys = response.data.reObject   
+					   
+					var sel = document.getElementById("country");
+					sel.innerHTML = "";
+				  	for(i=0;i< countrys.length;i++   ) 
+					{
+						var opt = new Option(countrys[i].name,countrys[i].id);//第一个代表标签内的内容，第二个代表value
+						sel.options.add(opt);
+					}
+				})
+			  .catch(function (error) {  
+				 showErrTips("朝代信息：" + error) 
+			});
+		}
+		
+	}
+	 
+}
+ 
+vm = Vue.createApp(app).mount('#app')
+   
+function hiddenBar(divId)
+{ 
+	var modal = document.getElementById(divId);
+	modal.style.width = "0px"; 
+	 
+} 
+function showconntent(bookid,gid)
+{
+	window.open('bookcontent.html?bookid=' + bookid + '&paraid=' + gid,'_blank') 
+}
+
+
+</script>
+
+</body>
+</html>
