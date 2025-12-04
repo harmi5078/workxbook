@@ -1,0 +1,232 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>联系人管理</title>  
+<link href="../bootstrap/5.1.1/bootstrap.min.css" rel="stylesheet">  
+<script src="../bootstrap/5.1.1/bootstrap.bundle.min.js"></script>  
+<script src="../js/vue.global.js"></script>
+<script src="../js/axios.min.js"></script>
+<script src="js_txnav.js"></script>
+<script src="js_txcommon.js"></script> 
+<link href="css_txworks.css" rel="stylesheet"> 
+
+</head> 
+<body>
+
+<div id="startmenu" style="z-index:88;"></div> 
+<div id = "app" onmousedown="closeNav()" style="z-index: 8;"> 	
+  
+<div  class="tx_oneframe"> 
+
+<div class="tx_onerow" > 
+	 
+<div v-for="item in items" class=" tx_one_card" style="margin-top:1px;margin-right: 1px; margin-left:1px;">
+	
+	<div  class="tx_card_hearder"  >
+		<a style="cursor: pointer;" @click="toEditAcc(item)"
+		  data-bs-toggle="modal" data-bs-target="#myModal">{{ item.company  }}  </a>  
+	</div>
+	<div  class="tx_card_body" > 
+	  <p>{{ item.name }} </p>  
+      <p>{{ item.addr }} .{{ item.phone }} .{{ item.email }}   </p> 
+      <p>{{ item.wxid }}</p>  
+      
+		   
+	</div>
+	
+</div>	
+</div>   
+</div>
+ 
+   
+<!-- 模态框 -->
+<div class="modal" id="myModal">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+      <!-- 模态框头部 -->
+      <div class="tx_modal_header" >
+        <h4 class="modal-title">{{modelTitle}}</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <!-- 模态框内容 -->
+      <div class="modal-body">
+        <div class="container mt-3">
+ 
+			<form  class="needs-validation">
+				<input type="hidden" v-model="isedit"   class="form-control" >
+				<input type="hidden" v-model="tid"   class="form-control" >
+				<div class="input-group " style="margin-bottom:0.2rem">
+					<span class="input-group-text">公司</span>
+					<select class="form-select" v-model="company">
+						<option v-for="com  in companys" :value="com.id">
+						  {{ com.name }}
+						</option>
+					</select>
+				</div> 
+				 
+				<div class="input-group tx_mb_2">
+					<span class="input-group-text">姓名</span>
+					<input type="text" v-model="staffname"  class="form-control" placeholder="联系人姓名">
+				</div> 
+				
+				<div class="input-group tx_mb_2">
+					<span class="input-group-text">地址</span>
+					<input type="text" v-model="addr"  class="form-control" placeholder="联系人地址">
+				</div> 
+				
+				<div class="input-group tx_mb_2">
+					<span class="input-group-text">电话</span>
+					<input type="text" v-model="phone"  class="form-control" placeholder="联系人电话">
+				</div> 
+				
+				<div class="input-group tx_mb_2">
+					<span class="input-group-text">邮箱</span>
+					<input type="text" v-model="email"  class="form-control" placeholder="联系人邮箱">
+				</div> 
+				
+				<div class="input-group tx_mb_2">
+					<span class="input-group-text">微信</span>
+					<input type="text" v-model="weixin"  class="form-control" placeholder="联系人微信">
+				</div> 
+				
+				<div class="input-group tx_mb_2">
+					<span class="input-group-text">备注</span>
+					<input type="text" v-model="remark"  class="form-control" placeholder="备注">
+				</div>
+
+				<!-- 模态框底部 -->
+			  	<div class="modal-footer">
+				<button type="button" class="btn btn-danger" data-bs-dismiss="modal">关闭</button>
+				<button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="toSave" >保存</button>
+			  </div>				
+			</form>
+		</div>
+      </div>
+    </div>
+  </div>
+</div>
+</div>
+
+</div>
+
+<div class="tx_topright">
+<button class="btn btn-primary " type="button" @click="toAddNew"   data-bs-toggle="modal" 
+data-bs-target="#myModal"  >添加</button> 
+</div>    
+<script>
+const app = {
+	data() {
+		return {
+		  items : [] ,	 
+		  startmenuHtml : getStartMenuHtml_fb() , 
+		  modelTitle : '新增联系人',
+		  company : 1,
+		  staffname: '',
+		  phone: '',
+		  weixin: '',
+		  addr: '',
+		  email: '', 
+		  remark: '',
+		  companys: [
+					{ name: '泰湘', id: 1 },
+					{ name: '维卡', id: 2 } 
+				  ]	,
+		  isedit: false	  
+		}
+	},
+	mounted () {
+		axios.get('/getcomplist')
+		  .then(response => (this.companys = response.data.reObject))
+		  .catch(function (error) {  
+			this.companys = [{ name: '泰湘', id: 1 },
+				{ name: '维卡', id: 2 }   ]	  ;
+		});
+		this.reloadData()
+	},
+	methods: { 
+		  
+		reloadData(event) { 
+			  axios
+			  .get('/getstaff')
+			  .then(response => (this.items = response.data.reObject))
+			  .catch(function (error) { // 请求失败处理
+				 
+			});
+		} ,
+		
+		toSave(event){
+			const params = { 
+				cid: this.company,
+				name: this.staffname,
+				addr:this.addr,
+				phone: this.phone,
+				email: this.email,
+				wxid: this.weixin,
+				remark: this.remark 
+			}
+			 
+			if(!this.isedit)
+			{
+				this.addStaff(event,params);
+			}
+			else
+			{ 
+				this.saveStaff(event,params);
+			}
+			
+		} ,
+		
+		saveStaff(event,params) {
+			
+             axios
+			  .post('/savestaff', params)
+			  .then(
+			  function (response) {
+				  showOKTips(params.name + ":修改成功！") 
+			  }  
+			  )
+			  .catch(function (error) { // 请求失败处理
+				  showErrTips(params.name + ":修改失败！")  
+			});   
+			 
+        } ,
+        addStaff(event,params) {
+			alert(params.name)
+             axios
+			  .post('/addstaff', params)
+			  .then(
+			  function (response) {
+				 showOKTips(params.name + "添加成功！")
+			  }  
+			  )
+			  .catch(function (error) { // 请求失败处理
+				   showErrTips(params.name + "添加失败！")
+			});    
+        } ,
+		
+        toEditAcc(item)
+        { 
+			this.isedit = true
+			this.modelTitle =item.accName + " - 编辑" 
+			this.company = item.companyId
+			this.accName = item.accName
+			this.accNo = item.accNo
+			this.isCompany = item.isCompany
+			this.status = item.status
+			this.remark = item.remark
+			this.bank = item.bank
+			this.remark = item.remark 
+			this.accId = item.accId 
+		}
+	  }  
+}
+ 
+vm = Vue.createApp(app).mount('#app')
+ 
+</script>
+ 
+</body>
+</html>

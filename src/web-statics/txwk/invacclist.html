@@ -1,0 +1,271 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>报销明细清单</title>  
+ 
+<link href="../bootstrap/5.1.1/bootstrap.min.css" rel="stylesheet">  
+<script src="../bootstrap/5.1.1/bootstrap.bundle.min.js"></script>  
+<script src="../js/vue.global.js"></script>
+<script src="../js/axios.min.js"></script>
+<script src="js_txnav.js"></script>
+<script src="js_txcommon.js"></script> 
+<link href="css_txworks.css" rel="stylesheet"> 
+
+<script type="text/javascript" src="https://cdn.staticfile.net/jquery/2.1.1/jquery.min.js"></script>
+<script type="text/javascript" src="https://lf9-cdn-tos.bytecdntp.com/cdn/expire-1-M/qrcodejs/1.0.0/qrcode.min.js"></script>
+
+<script  >
+var got = true
+function makeQRCode(){
+	if (got){  
+		got = false
+		var qrDivs = document.getElementsByClassName("tx_qr");
+		var i;
+		for (i = 0; i < qrDivs.length; i++) {
+			var qrcode = new QRCode(qrDivs[i], {
+				width : 80,
+				height : 80
+			});
+				 
+			qrcode.makeCode(qrDivs[i].title); 
+		}
+	}
+}
+</script>  
+</head>
+<body>
+
+<div id="startmenu" style="z-index:88;"></div> 
+<div id = "app" onmousedown="closeNav()" style="z-index: 8;"> 	
+ 
+<div id="framediv" class="tx_nobgframe" onmousemove="makeQRCode()" onmousedown="closeNav()" style="height:auto; ">
+<div class="tx_onerow"  >
+	
+	<div  style="height: auto;">
+	 <div class="tx_container" v-for="monItem in items" >  
+	 	<div class="tx_onerow" > 
+		 <div   class="tx_invheader" >	  
+			 <div  > 
+			       <div class="tx_onerow " >
+					    <div class="tx_center"> 泰湘报销表(费用支出发票)</div>
+					</div>  
+			</div> 
+		</div>
+		<div  class="tx_invheader   " > 
+			<div style="width: 250px;">
+			 <div  class="tx_invLine1   " >  </div> 
+			  </div> 
+		</div> 
+		<div  class="tx_invheader   " > 
+			<div style="width: 250px;">
+			 <div  class="tx_invLine2   " >  </div> 
+			 </div> 
+		</div> 		
+		<div  class="tx_invtotal   " >  
+			  
+		    <div style="width: 70%;"> <div class="tx_qr"  >  </div>  </div>
+		    	<div style="width: 30%;"> 
+					<div class="tx_invamtgroup"> 
+						<div class="tx_invamtname"> 发票总额:</div> 
+						<div class="tx_invamtvalue">  {{monItem.reportData.amt}}  </div>
+					</div>
+					<div class="tx_invamtgroup"> 
+						<div class="tx_invamtname"> 统计月份:</div> 
+						<div class="tx_invamtvalue">  {{monItem.key}}  </div>
+					</div>   
+			  
+			</div> 
+			 
+		</div> 	
+		<div  class="tx_invheader   " > 
+			<div style="width: 143px;">
+			 <div  class="tx_invmark  tx_center " >  </div>  </div>  
+		</div> 	 
+		
+		<div class="tx_invoicebox"   > 
+			<div> 
+				<div class="tx_onerow tx_invbottomborder" style="height: 70px;">
+				    <div style="width: 2%;font-size: 15px;text-align:center;vertical-align:middle; " >报<br>销<br>主体</div > 
+				    <div style="width: 30%;" class="tx_invleftborder">
+						
+						<div class="tx_invinnercompany"> 
+							<div class="tx_invinnertitle"> 名称：</div> 
+							<div class="tx_invinnername"> 深圳市泰湘贸易有限公司</div>
+						</div>
+					</div >  
+					<div style="width: 15%;"  >
+						 &emsp;&emsp;
+					</div >  
+				    <div style="width: 2%;font-size: 15px;text-align:center;" class="tx_invleftborder">报<br>销<br>主体</div > 
+				    <div style="width: 30%;" class="tx_invleftborder">
+						<div class="tx_invinnercompany"> 
+							<div class="tx_invinnertitle"> 月份：</div> 
+							<div class="tx_invinnername"> {{monItem.key}}</div>
+						</div>
+					</div >  
+					<div style="width: 15%;"  >
+						 &emsp;&emsp;
+					</div > 
+					
+				</div>
+			       <div class="tx_onerow " >
+					    <div style="width: 5%;">编号</div > 
+					    <div style="width: 10%;">日期</div >  
+						<div style="width: 35%;">公司</div >	
+						<div style="width: 15%;">票额</div >	
+						<div style="width: 35%;">大写票额</div >	 
+					</div>
+					
+					<div v-for="(item,index) in monItem.list"  class="tx_onerow tx_inv_goods_row " > 
+						<div style="width: 5%;" v-bind:title="item.invoiceNo">{{cutInvNo(item.invoiceNo)}} </div>
+					    <div style="width: 10%;"> {{item.makeDate}}  </div> 
+						<div style="width: 35%;"> {{item.companyName}}  </div>	 
+						<div style="width: 15%;"> {{formatAmt(item.totalAmt)}}    </div>	 	 
+						<div style="width: 35%;"> {{convertAmt(item.totalAmt)}}  </div>
+					</div>  
+					<div v-if="monItem.list.length < 10">
+						<div v-for="(index) in  (10 ) "  class="tx_onerow tx_inv_goods_row " > 
+							<div style="width: 20%;color:aliceblue"> &emsp; </div> 
+						</div>  
+					</div>  
+					<div v-else>
+				       <div v-for="(index) in  (3) "  class="tx_onerow tx_inv_goods_row " > 
+							<div style="width: 20%;color:aliceblue"> &emsp;  </div> 
+						</div>  
+				    </div>
+				    <div class="tx_onerow tx_invtopborder" >
+					    <div style="width: 10%;font-size: 15px;" > <div style="margin:15px"> 合计</div > </div > 
+					    <div style="width: 80%;" class="tx_invleftborder"> 
+							<div  >  
+								<div class="tx_invinnerDetails"> 
+									 {{formatAmt(monItem.reportData.amt)}} &emsp;&emsp;
+									{{convertAmt(monItem.reportData.amt)}}
+									</div>
+							</div>
+						</div >   
+					</div>
+			</div>
+			</div>
+		</div>	
+	  </div> 
+	</div> 
+	 
+ 
+</div>	
+</div>
+
+
+    
+</div>
+ 
+<script>
+ 	
+const app = {
+
+	data() {
+		return {
+		  items : [] ,	 
+		  startmenuHtml : getStartMenuHtml() ,  
+		  modelTitle : '新增报关信息',
+		  delivers : [] ,
+		  companyList : [] ,
+		  billId:0,	
+		  taxtype:1,
+		  container:1,
+		  deliver : 0,
+		  company:0,
+		  entryDate : '',
+		  truckDate:'',
+		  shortDesc: '',
+		  billNo: '',
+		  deliverFee: '',
+		  goods:'',
+		  remark: '' ,		  
+		  isedit: false,
+		  lastYDay:'2024-01-01',
+		  todayDate:'2024-09-09'
+		}
+	},
+	mounted () {
+		
+		this.entryDate = getDate()
+		this.truckDate = getDate()
+		this.lastYDay = getDate("month",-12)
+		this.todayDate = getDate()
+		
+		this.endTime = getDate()   
+		this.startTime = "2021-11-09"  
+		 
+		
+		this.reloadData()
+	},
+	methods: {  
+		queryData()
+		{
+			this.reloadData()
+		},  
+		queryReset()
+		{
+			this.endTime = getDate()   
+			this.startTime = "2021-11-09"
+			this.remark = ""
+			this.goods = ""
+			this.company = 0
+			
+		},
+		reloadData() { 
+			
+			const params = {  
+					company:this.company, 
+					startTime:this.startTime,
+					endTime:this.endTime
+			  }
+			
+			 axios
+			  .get('/getminvacclist',{params:params} )
+			  .then(response => {
+				  this.items = response.data.reObject 
+			  
+				})
+			  .catch(function (error) { // 请求失败处理
+				showErrTips("数据加载失败：" + error) 
+			}); 
+		} , 
+		makeQRCode2(item){
+			    
+			//var comId = item.object.id 
+			
+			//var divId = "qrcode" + comId
+			
+			var qrcode = new QRCode(document.getElementById('divId'), {
+				width : 80,
+				height : 80
+			});
+			 
+			qrcode.makeCode(item.key); 
+			 
+		} ,
+		formatAmt(amt)
+		{
+			return formatNumber(amt)
+		} ,
+		convertAmt(amt)
+		{
+			return convertCurrency(amt) 
+		},
+		cutInvNo(invNo)
+		{
+			lenn = invNo.length 
+			str = invNo.substring(lenn-4,lenn)  
+			return   str
+		} 
+	}  
+}
+ 
+vm = Vue.createApp(app).mount('#app') 
+</script>
+ 
+
+</body>
+</html>

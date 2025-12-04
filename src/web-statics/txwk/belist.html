@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>报关单数据明细表</title>  
+<link href="../bootstrap/5.1.1/bootstrap.min.css" rel="stylesheet">  
+<script src="../bootstrap/5.1.1/bootstrap.bundle.min.js"></script>  
+<script src="../js/vue.global.js"></script>
+<script src="../js/axios.min.js"></script>
+<script src="js_txnav.js"></script>
+<script src="js_txcommon.js"></script> 
+<link href="css_txworks.css" rel="stylesheet"> 
+
+</head>
+<body >
+	
+<div id="startmenu" style="z-index:88;"></div> 
+<div id = "app" onmousedown="closeNav()" style="z-index: 8;"> 	
+	
+   
+<div class="tx_topLev2"  > </div> 
+<div   id="maindiv"  class="tx_oneframe"  onmousedown="closeNav()" style="font-family: 宋体; background-color: aliceblue;"> 
+
+<div class="tx_onerow" style="position: fixed;width: 86.5%;background-color: aliceblue;border: var(--cell-boder );">  
+	<div   class="tx_acccheckheader" style="margin-top:20px ;" >	 
+			 <li  class="tx_img_customs " ></li>泰湘贸易报关数据明细表
+	</div>
+	
+	<div class="tx_onerow  " style="width: 100% ; margin-top: 10px;"> 	  
+			<div class=" " style="width:24%;padding-left: .2rem;"> 
+				<div class="tx_acheckgroup"> 
+									<div class="tx_accname"> 起始日期：</div> 
+									<div class="tx_accvalue"> 
+										<input type="date" @change="loadData()" v-model="startTime"  class="tx_titleDateLabel  " placeholder="支付时间" 
+					 min="2020-01-01" max="2025-12-31">  </div>
+				 </div> 
+			</div >	
+					
+			<div class=" "  style="width: 24%;padding-left: .2rem;">
+				<div class="tx_acheckgroup"> 
+									<div class="tx_accname"> 截止日期：</div> 
+									<div class="tx_accvalue"><input type="date" @change="loadData()" v-model="endTime"  class="tx_titleDateLabel" placeholder="支付时间" 
+					 min="2020-01-01" max="2025-12-31">  </div>
+				 </div> 
+			
+			</div >	 	
+		 
+			<div class=" " style="width:24%;padding-left: .2rem;"> 
+				<div  class=" ">
+					<B>出口总金额:</B>  <span>{{formatAmt(totalAmt)}}</span> 
+				</div> 
+			</div >	
+					
+			<div class=" "  style="width: 24%;padding-left: .2rem;">
+				<div  >
+					<B>出口总单数:</B>  
+					<span> {{totalBes}} </span> 
+				</div>
+			
+			</div >	 	 
+				 
+	</div >	      
+
+	<div class="tx_onerow " style="font-weight: bold;width: 100%;border-top: var(--cell-boder );" >
+		    <div style="width: 8%;padding-left:8px;" @click="orderDataByDate()">日期 
+				<i id="dateOrderType" class=" "></i> </div >
+			<div style="width: 17%;padding-left:8px;" class="tx_cellboder_left">编号</div >	 
+			<div style="width: 10%;padding-left:8px;" class="tx_cellboder_left "><input type="text"  @change="loadData()" v-model="goods" class="tx_acekTitleLabel" placeholder="货品"  ></div >	 	
+			<div style="width: 10%;padding-left:8px;" class="tx_cellboder_left">数量</div >	
+			<div style="width: 10%;padding-left:8px;" class="tx_cellboder_left">单位</div >
+			<div style="width: 10%;padding-left:8px;" class="tx_cellboder_left">货值</div >	  
+			<div style="width: 8%;padding-left:8px;" class="tx_cellboder_left">地区</div >	 
+			<div style="width: 25%;padding-left:8px;" class="tx_cellboder_left"><input type="text"  @change="loadData()" v-model="supplierName" class="tx_acekTitleLabel" placeholder="供应商"  > </div > 
+	</div> 
+</div >
+
+<div style="margin-top: 122px;"  > 
+    <div   v-for="monItem in items"  >  
+	    <div class="tx_onerow  tx_rowcellboder tx_tab_row"   > 
+			<div style="width: 8%;padding-left:8px;"  >  <b> {{monItem.key}}</b></div >   
+		</div>  
+		<div v-for="(item,index) in monItem.list"> 
+			<div class="tx_onerow  tx_rowcellboder tx_tab_row"   v-for="goods in item.billGoodses" @mouseover="toselect(goods)" > 
+					<div style="width: 8%;padding-left:8px;"  > {{item.entryDate}} </div >
+					<div style="width: 17%;padding-left:8px;" class="tx_cellboder_left">{{item.billNo }}({{(index+1) }})</div >	 
+					<div style="width: 10%;padding-left:8px;" class="tx_cellboder_left">{{goods.goods }}</div >	 	
+					<div style="width: 10%;padding-left:8px;" class="tx_cellboder_left"> {{formatAmt(goods.billQuantity)}} </div >	
+					<div style="width: 10%;padding-left:8px;" class="tx_cellboder_left">{{goods.billUnits }}</div >
+					<div style="width: 10%;padding-left:8px;" class="tx_cellboder_left">{{formatAmt(goods.billAmt)}} </div >	  
+					<div style="width: 8%;padding-left:8px;" class="tx_cellboder_left"> {{ goods.taxAddr}}</div >	 
+					<div style="width: 24%;padding-left:8px;" v-bind:id="'gid'+goods.gid" v-bind:class="'tx_cellboder_left besupply'+ item.billId" > {{ item.supplierName}} </div >
+					<div  style="width: 2%;padding-left:8px;cursor: pointer;"  class="dropdown" v-if="billIdSel==goods.billId" >  
+					<a   data-bs-toggle="dropdown">
+					<svg xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" viewBox="0 0 32 32"><path fill="currentColor" d="M8 26H4a2 2 0 0 1-2-2v-4h2v4h4zM2 12h2v4H2zm24-4h-2V4h-4V2h4a2 2 0 0 1 2 2zM12 2h4v2h-4zM4 8H2V4a2 2 0 0 1 2-2h4v2H4zm23 24a1 1 0 0 1-.707-.293l-6.138-6.138l-3.323 4.986a1 1 0 0 1-1.79-.268l-6-20a1 1 0 0 1 1.245-1.245l20 6a1 1 0 0 1 .268 1.79l-4.986 3.323l6.138 6.138a1 1 0 0 1 0 1.414l-4 4A1 1 0 0 1 27 32m0-2.414L29.586 27l-7.155-7.155l5.246-3.498l-16.185-4.855l4.855 16.185l3.498-5.246z"/></svg>
+					</a>
+					<ul class="dropdown-menu" style="height: 300px;overflow: auto;">
+				       	<li v-for="supp in suppliers">
+					  		<div class="dropdown-item" @click="selectSupply(goods.billId,supp)">{{supp.fullName}}</div>
+			      		</li>
+				    </ul>
+					
+					</div > 
+			</div>  
+		</div>  
+	</div> 
+	
+	<div class="tx_onerow "  style="border-top: var(--cell-boder );border-left: var(--cell-boder );border-right: var(--cell-boder );" >
+		    <div style="width: 8%;" > &emsp;</div >
+			<div style="width: 10%;"  ></div >	 
+			<div style="width: 10%;" ></div >	 	
+			<div style="width: 10%;"  ></div >	
+			<div style="width: 10%;"  ></div >	  
+			<div style="width: 25%;"  ></div >	 
+			<div style="width: 25%;"  ></div > 
+	</div> 		
+</div>	  
+</div>
+  
+    
+</div>       
+</body>
+<script>
+	
+
+
+
+const app = {
+	data() {
+		return {
+		  items : [] ,	   
+		  startmenuHtml : getStartMenuHtml_fb() ,  
+		  suppliers : [] ,
+		  totalAmt:0.0,
+		  totalBes:0,
+		  startTime:'',
+		  endTime:'' ,
+		  goods:''	,
+		  supplierName:'',	 
+		  orderDate:0  ,
+		  billIdSel:0
+		}
+	},
+	mounted () {
+		  
+		this.endTime = getDate()   
+		this.startTime = "2021-11-09"  
+		  
+		 
+		this.loadData() 
+		
+		const params = {  
+				queryType:3 
+		}	
+		
+		
+		axios.get('/getcomplist',{params:params})
+		  .then(response => {
+				this.suppliers = response.data.reObject 
+		  })
+		  .catch(function (error) {  
+			 
+		});
+		 
+              
+	},
+	methods: {   
+		loadData() { 
+			 
+			const params = {  
+				startTime:this.startTime,
+				endTime:this.endTime,
+				goods:this.goods,
+				supplierName:this.supplierName,
+				orderField:this.orderDate
+			 }	
+			 
+			axios
+			  .get('/getmbills',{params:params} )
+			  .then(response => {
+				  
+				    this.items = response.data.reObject
+					this.totalAmt =   response.data.reportData["amt"]
+					this.totalBes =   response.data.reportData["bes"]
+			   })
+			  .catch(function (error) { // 请求失败处理
+				showErrTips("数据加载失败：" + error) 
+			});
+			
+		}  ,
+		
+		formatAmt(amt)
+		{
+			return formatNumber(amt)
+		} ,
+		convertAmt(amt)
+		{
+			return convertCurrency(amt) 
+		},
+		cutBiilNo(invNo)
+		{
+			lenn = invNo.length 
+			str = invNo.substring(lenn-4,lenn)  
+			str = invNo.substring(0,3) + "..." + str
+			return   str
+		},
+		orderDataByDate()
+		{
+			var div = document.getElementById("dateOrderType"); 
+			if(this.orderDate==0 || this.orderDate==1)
+			{
+				this.orderDate=2
+				div.className = "tx_icon_orderup"; 
+			}
+			else if(this.orderDate==2){
+				this.orderDate=1
+				div.className = "tx_icon_orderdown"; 
+			}
+			
+			this.loadData(); 
+		} , 
+		toselect(goods)
+		{ 
+			console.log(event.srcElement.className)
+			
+			if("dropdown-item"==event.srcElement.className)
+			{
+				var i
+			}
+			this.billIdSel = goods.billId
+			
+			
+		},
+		selectSupply(billId,supp)
+		{
+			 
+			
+			const params = {  
+				billId:billId,
+				supplier:supp.id
+			}	
+	 
+			axios.post('/modifybesupplier',params)
+			  .then(response => {
+					var qrDivs = document.getElementsByClassName("besupply" + billId);
+					
+					var i; 
+					for (i = 0; i < qrDivs.length; i++) {
+						var div = qrDivs[i]
+						div.innerHTML = supp.fullName
+					} 
+					
+					tipDivWithCls("besupply" + billId)
+			  })
+			  .catch(function (error) {  
+				 showErrTips("更新失败：" + error) 
+			}); 
+			
+		}
+	  } 
+}
+ 
+vm = Vue.createApp(app).mount('#app');
+
+function supplyChange(billId)
+{ 
+	 
+	var selectDivs = document.getElementsByClassName("form-select");
+	
+	comId = 0 
+	
+	if (selectDivs[0]){
+		 comId =  (selectDivs[0].value)
+	}
+	else{
+		return	
+	}
+	
+	var index = selectDivs[0].selectedIndex 
+	supName = selectDivs[0][index].text
+	 
+	
+	
+	
+} 
+		  
+</script>
+
+  
+</body>
+</html>

@@ -1,0 +1,189 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>公账对账明细</title>  
+<link href="../bootstrap/5.1.1/bootstrap.min.css" rel="stylesheet">  
+<script src="../bootstrap/5.1.1/bootstrap.bundle.min.js"></script>  
+<script src="../js/vue.global.js"></script>
+<script src="../js/axios.min.js"></script>
+<script src="js_txnav.js"></script>
+<script src="js_txcommon.js"></script> 
+<link href="css_txworks.css" rel="stylesheet"> 
+
+</head>
+<body >
+<div id="startmenu" style="z-index:88;"></div> 
+<div id = "app" onmousedown="closeNav()" style="z-index: 8;"> 	
+	
+<div class="tx_topLev2"  > </div> 
+<div   id="maindiv"  class="tx_oneframe"  onmousedown="closeNav()" style="font-family: 宋体; background-color: aliceblue;"> 
+
+<div class="tx_onerow" style="position: fixed;width: 86.5%;background-color: aliceblue;border: var(--cell-boder );">  
+	<div   class="tx_acccheckheader" style="margin-top:20px ;" >	 
+			 泰湘贸易有限公司电子对账表
+	</div>
+	<div class="tx_onerow  " style="width: 100% ;margin-bottom: 3px;"> 	 
+		  
+		<div   style="width: 23% ">
+			 
+				<div class="tx_acheckgroup"> 
+									<div class="tx_achckname"> 起始日期：</div> 
+									<div class="tx_acheckvalue"> 
+										<input type="date" @change="reloadData()" v-model="startTime"  class="tx_titleDateLabel  " placeholder="支付时间" 
+					 min="2020-01-01" max="2025-12-31">  </div>
+				 </div> 
+		</div >	 
+		<div  style="width: 23% "> 
+				<div class="tx_acheckgroup"> 
+									<div class="tx_achckname"> 截止日期：</div> 
+									<div class="tx_acheckvalue"><input type="date" @change="reloadData()" v-model="endTime"  class="tx_titleDateLabel" placeholder="支付时间" 
+					 min="2020-01-01" max="2025-12-31">  </div>
+				 </div> 
+		</div >	   
+	</div >	      
+
+	<div class="tx_onerow " style="font-weight: bold;width: 100%;border-top: var(--cell-boder );" >
+		    <div style="width: 8%;padding-left:8px;" @click="orderDataByDate()">日期 
+				<i id="dateOrderType" class=" "></i> </div >
+			<div style="width: 10%;padding-left:8px;" class="tx_cellboder_left "><input type="text"  @change="reloadData()" v-model="remark" class="tx_acekTitleLabel" placeholder="摘要"  ></div >	 
+			<div style="width: 10%;padding-left:8px;" class="tx_cellboder_left">借方金额</div >	 	
+			<div style="width: 10%;padding-left:8px;" class="tx_cellboder_left">贷方金额</div >	
+			<div style="width: 10%;padding-left:8px;" class="tx_cellboder_left">余额</div >	  
+			<div style="width: 25%;padding-left:8px;" class="tx_cellboder_left">对方账号</div >	 
+			<div style="width: 25%;padding-left:8px;" class="tx_cellboder_left"><input type="text"  @change="reloadData()" v-model="accName" class="tx_acekTitleLabel" placeholder="对方户名"  > </div > 
+	</div> 
+</div >
+
+<div style="margin-top: 117px;"> 
+
+	<div class="tx_onerow  tx_rowcellboder tx_tab_row" v-for="(item,index) in accCheckList"  > 
+		<div style="width: 8%;padding-left:8px;"  > {{item.accDate}}</div >
+		<div style="width: 10%;padding-left:8px;" class="tx_cellboder_left">{{item.descs}}</div >	 
+		<div style="width: 10%;padding-left:8px;" class="tx_cellboder_left">{{formatAmt(item.payAmt)}}</div >	 	
+		<div style="width: 10%;padding-left:8px;" class="tx_cellboder_left">{{formatAmt(item.recAmt)}}</div >	
+		<div style="width: 10%;padding-left:8px;" class="tx_cellboder_left">{{formatAmt(item.balance)}}</div >	  
+		<div style="width: 25%;padding-left:8px;" class="tx_cellboder_left">{{item.accNo}}</div >	 
+		<div style="width: 25%;padding-left:8px;" class="tx_cellboder_left">{{item.accName}}</div > 
+	</div>  
+</div>			
+	<div class="tx_onerow "  style="border-top: var(--cell-boder );border-left: var(--cell-boder );border-right: var(--cell-boder );" >
+		    <div style="width: 8%;" > &emsp;</div >
+			<div style="width: 10%;" >&emsp;合计</div >	 
+			<div style="width: 10%;" >{{formatAmt(totalPayAmt)}}</div >	 	
+			<div style="width: 10%;"  >{{formatAmt(totalRecAmt)}}</div >	
+			<div style="width: 10%;"  ></div >	  
+			<div style="width: 25%;"  ></div >	 
+			<div style="width: 25%;"  ></div > 
+	</div> 		 
+ 	
+		  
+</div>
+ 
+ 
+ 
+    
+</div>       
+</body>
+<script>
+	
+
+
+
+const app = {
+	data() {
+		return {
+		  accCheckList : [] ,	 
+		  startmenuHtml : getStartMenuHtml_fb() ,  
+		  startTime:'',
+		  endTime:'' ,
+		  remark:''	,
+		  accName:'',	 
+		  orderDate:0  ,
+		  totalPayAmt:0.0,
+		  totalRecAmt:0.0
+		}
+	},
+	mounted () {
+		  
+		this.endTime = getDate()   
+		this.startTime = "2021-11-09"  
+		  
+		const params = {  
+			startTime:this.startTime,
+			endTime:this.endTime,
+		 }	
+			
+		this.loadData(params,false) 
+		 
+              
+	},
+	methods: {  
+		reloadData()
+		{
+			orderDateField = ""
+			if(this.orderDate==2)
+			{
+				orderDateField = " accDate"
+			}else{
+				orderDateField = " accDate desc "
+			}
+			const params = {  
+				startTime:this.startTime,
+				endTime:this.endTime,
+				descs:this.remark,
+				accName:this.accName,
+				orderField:orderDateField
+			 }	
+			
+			this.loadData(params,false) 
+		
+		},
+		loadData(params,paged) { 
+			
+			  axios
+			  .get('/getaccchecks',{params:params})
+			  .then(response => {
+				  
+				  this.accCheckList = response.data.reObject
+				  this.totalRecAmt = response.data.reportData["totalRecAmt"]
+				  this.totalPayAmt = response.data.reportData["totalPayAmt"]
+				  
+			  })
+			  .catch(function (error) { // 请求失败处理
+				 
+			});
+		}  ,
+		formatAmt(amt)
+		{
+			return formatNumber(amt)
+		} ,
+		convertAmt(amt)
+		{
+			return convertCurrency(amt) 
+		},
+		orderDataByDate()
+		{
+			var div = document.getElementById("dateOrderType"); 
+			if(this.orderDate==0 || this.orderDate==1)
+			{
+				this.orderDate=2
+				div.className = "tx_icon_orderup"; 
+			}
+			else if(this.orderDate==2){
+				this.orderDate=1
+				div.className = "tx_icon_orderdown"; 
+			}
+			
+			this.reloadData(); 
+		}
+	  } 
+}
+ 
+vm = Vue.createApp(app).mount('#app');
+  
+</script>
+
+  
+</body>
+</html>

@@ -1,0 +1,135 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>Python文件脚本执行管理</title>  
+<link href="../bootstrap/5.1.1/bootstrap.min.css" rel="stylesheet">  
+<script src="../bootstrap/5.1.1/bootstrap.bundle.min.js"></script>  
+<script src="../js/vue.global.js"></script>
+<script src="../js/axios.min.js"></script>
+<script src="js_txnav.js"></script>
+<script src="js_txcommon.js"></script> 
+<link href="css_txworks.css" rel="stylesheet"> 
+
+<style>
+	
+#img_input2 {
+  display: none;
+}
+#img_label2 {
+  background-color: rgb(0, 64, 64);
+  border-radius: 5px;
+  display: inline-block;
+  padding: 10px;
+  cursor: pointer;
+}
+</style>
+</head>
+<body>
+
+<div id="startmenu" style="z-index:88;"></div> 
+<div id = "app" onmousedown="closeNav()" style="z-index: 8;"> 	
+ 
+<div  class="tx_oneframe" onmousedown="closeNav()"> 
+	   
+    <div class="container mt-3"> 
+			 
+	 	<div class="input-group tx_mb_2"> 
+				<button type="button" @click="commitDB"  class="tx_btn_primary" >提交数据</button>
+		</div>	
+		
+		<div  > {{pythonResult}} </div> 
+					 
+		<hr />
+	</div>
+		 
+		 
+</div>
+
+</div>
+ 
+<script>
+ 	
+const app = {
+
+	data() {
+		return {  
+		  startmenuHtml : getStartMenuHtml_fb()  ,
+		  pythonResult:'执行结果'
+		   
+		}
+	},
+	mounted () { 
+		 
+	},
+	methods: { 
+		 
+		commitDB(event) {    
+			 
+			 
+		axios.get('/commitdb')
+		  .then(response => {
+			  this.pythonResult = response.data.reObject  
+			   
+		}).catch(function (error) { // 请求失败处理
+			  this.pythonResult = error  
+		});   		 
+	    } 
+		
+	}  
+}
+ 
+vm = Vue.createApp(app).mount('#app')
+ 
+</script>
+<script type="text/javascript">
+function clearFile(){
+   document.getElementById("billentry").value = ""
+}
+   
+function handleFileSelect(evt) {
+	evt.stopPropagation();
+	evt.preventDefault();
+	
+	var files = evt.dataTransfer.files; // 文件对象
+	
+	  // 处理多文件
+	var output = [];
+	
+	for (var i = 0, f; f = files[i]; i++) { 
+		var filename = f.name
+		fileExt = filename.substring(filename.lastIndexOf('.') + 1);
+		if(fileExt=="pdf" || fileExt=="PDF")
+		{ 
+			var formData = new FormData();
+			formData.append('file', f);
+			axios.post('/upload', formData, {})
+			output.push('<li><strong>',  f.name , '</strong> 已上传</li>'); 
+		}else{
+			output.push('<li><strong>',  f.name , '</strong> 文件格式不正确</li>'); 
+		}
+		
+	}
+		  // 显示文件信息
+	document.getElementById('list').innerHTML = output.join('');
+	
+	 
+	updateTables()
+	 
+}
+
+function handleDragOver(evt) {
+	evt.stopPropagation();
+	evt.preventDefault();
+	evt.dataTransfer.dropEffect = 'copy';
+}
+
+// Setup the dnd listeners.
+var dropZone = document.getElementById('drop_zone');
+dropZone.addEventListener('dragover', handleDragOver, false);
+dropZone.addEventListener('drop', handleFileSelect, false);
+
+</script> 
+
+</body>
+</html>

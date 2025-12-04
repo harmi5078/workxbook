@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>业务管理</title>  
+<link href="../bootstrap/5.1.1/bootstrap.min.css" rel="stylesheet">  
+<script src="../bootstrap/5.1.1/bootstrap.bundle.min.js"></script>  
+<script src="../js/vue.global.js"></script>
+<script src="../js/axios.min.js"></script>
+<script src="js_txnav.js"></script>
+<script src="js_txcommon.js"></script> 
+<link href="css_txworks.css" rel="stylesheet"> 
+
+</head>
+<body>
+
+<div id="startmenu" style="z-index:88;"></div> 
+<div id = "app" onmousedown="closeNav()" style="z-index: 8;"> 	
+  
+<div  class="tx_oneframe" onmousedown="closeNav()"> 
+<div class="tx_onerow" > 
+	 
+<div v-for="item in items" class=" tx_one_card" style="margin-top:1px;margin-right: 1px; margin-left:1px;">
+	
+	<div  class="tx_card_hearder"  >
+		<a style="cursor: pointer;" @click="toEdit(item)"
+		  data-bs-toggle="modal" data-bs-target="#myModal">{{ item.name  }}  </a>  
+	</div>
+	<div  class="tx_card_body" > 
+	  <p>{{ item.companyName }} |{{ item.partnerName }}</p>  
+      <p>{{ item.amts }}     </p> 
+      <p>{{ item.descs }}.{{ item.remark }} </p>  
+      
+		   
+	</div>
+</div>	
+</div>	
+   
+</div>
+   
+<!-- 模态框 -->
+<div class="modal" id="myModal">
+  <div class="modal-dialog modal-lg">
+    <div class="modal-content">
+
+      <!-- 模态框头部 -->
+      <div class="tx_modal_header">
+        <h4 class="modal-title">{{modelTitle}}</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+      <!-- 模态框内容 -->
+      <div class="modal-body">
+        <div class="container mt-3">
+ 
+			<form  class="needs-validation">
+				<input type="hidden" v-model="isedit"   class="form-control" >
+				<input type="hidden" v-model="businessId"   class="form-control" >
+				<div class="input-group " style="margin-bottom:0.2rem">
+					<span class="input-group-text">公司主体</span>
+					<select class="form-select" v-model="company">
+						<option v-for="com  in companys" :value="com.id">
+						  {{ com.name }}
+						</option>
+					</select>
+				</div> 
+				
+				<div class="input-group tx_mb_2">
+					<span class="input-group-text">合作公司</span>
+					<select class="form-select" v-model="partner">
+						<option v-for="com  in partners" :value="com.id">
+						  {{ com.name }}
+						</option>
+					</select>
+				</div> 
+				 
+				<div class="input-group tx_mb_2">
+					<span class="input-group-text">名称</span>
+					<input type="text" v-model="name"  class="form-control" placeholder="名称">
+				</div> 
+				
+				<div class="input-group tx_mb_2">
+					<span class="input-group-text">描述</span>
+					<input type="text" v-model="descs"  class="form-control" placeholder="描述">
+				</div> 
+				
+				<div class="input-group tx_mb_2">
+					<span class="input-group-text">规模</span>
+					<input type="text" v-model="amts"  class="form-control" placeholder="规模">
+				</div> 
+				
+				<div class="input-group tx_mb_2">
+					<span class="input-group-text">状态</span>
+					<select class="form-select" v-model="status">  
+						<option value="1">正常</option>
+						<option value="2">愉快</option>
+						<option value="3">摩擦</option> 
+						<option value="4">将停</option>
+						<option value="5">终止</option>
+					</select> 
+				</div> 
+				
+				<div class="input-group tx_mb_2">
+					<span class="input-group-text">备注</span>
+					<input type="text" v-model="remark"  class="form-control" placeholder="备注">
+				</div>
+
+				<!-- 模态框底部 -->
+			  				
+			</form>
+		</div>
+		<div class="modal-footer">
+			<button type="button" class="btn btn-danger" data-bs-dismiss="modal">关闭</button>
+			<button type="button" class="btn btn-primary" data-bs-dismiss="modal" @click="toSaveBusiness" >保存</button>
+		</div>	
+      </div>
+ 
+
+    </div>
+  </div>
+</div>
+</div>
+<button class="btn btn-primary tx_topright" type="button" @click="toAddNew"   data-bs-toggle="modal" 
+data-bs-target="#myModal"  >添加</button> 
+</div>    
+<script>
+const app = {
+	data() {
+		return {
+			items : [] ,	 
+			startmenuHtml : getStartMenuHtml_fb() , 
+			modelTitle : '新增业务信息',
+			businessId:'',
+			name : '', 
+			company: '1',
+			partner: '',
+			descs: '',
+			amts: '',
+			remark: '',
+			isedit: false,
+			companys: [
+					{ name: '泰湘', id: 1 }  
+				  ]	,
+			partners: []					  
+		}
+	},
+	mounted () {
+		axios.get('/getcomplist')
+		  .then(response => (this.partners = response.data.reObject))
+		  .catch(function (error) { // 请求失败处理
+			this.partners = [{ name: '泰湘66', id: 1 } ]	  ;
+		});
+		this.reloadData()
+	},
+	methods: { 
+		toAddNew(event)
+		{ 
+			this.isedit = false
+			this.modelTitle = "新增业务信息" 
+			this.name = ""
+			this.descs = ""
+			this.amts = "" 
+			this.remark = "" 
+			this.status = "" 
+		},		
+		reloadData(event) { 
+			  axios
+			  .get('/getbusiness')
+			  .then(response => (this.items = response.data.reObject))
+			  .catch(function (error) { // 请求失败处理
+				 showErrTips("数据加载失败：" + error) 
+			});
+		} ,
+		
+		toSaveBusiness(event){
+			 
+			const params = { 
+				businessId: this.businessId,
+				name: this.name,
+				companyId: this.company,
+				partnerId: this.partner,
+				descs: this.descs,
+				amts: this.amts,
+				remark: this.remark,
+				status: this.status
+			}			  
+			  
+			if(!this.isedit)
+			{ 
+				this.addbusiness(event,params);
+			}
+			else
+			{ 
+				this.savebusiness(event,params);
+			}
+			
+		} ,
+		
+		savebusiness(event,params) {
+			  
+             axios
+			  .post('/savebusiness', params )
+			  .then(
+			  function (response) { 
+			 	showOKTips(params.name + ":修改成功！")  	
+			  }  
+			  )
+			  .catch(function (error) { // 请求失败处理 
+				showErrTips(params.name + ":修改失败！")  
+			 
+			});   
+			 
+        } ,
+        addbusiness(event,params) {
+			
+			axios({
+				method:'post',
+				url:'/addbusiness',
+				data: params				
+			}).then(function(response) {
+				showOKTips(params.name + "添加成功！")
+			}).catch(function (error) { // 请求失败处理
+				showErrTips(params.name + "添加失败！")
+			});  
+        } ,
+        toEdit(item)
+        {
+			this.isedit = true
+			this.modelTitle =item.name + " - 编辑" 
+			this.name = item.name
+			this.company = item.companyId
+			this.partner = item.partnerId
+			this.descs = item.descs
+			this.amts = item.amts 
+			this.remark = item.remark
+			this.status = item.status    
+			this.businessId = item.businessId
+		} 
+	} 
+	  
+}
+ 
+vm = Vue.createApp(app).mount('#app')
+ 
+</script>
+ 
+</body>
+</html>

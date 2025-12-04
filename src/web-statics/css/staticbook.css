@@ -1,0 +1,262 @@
+html,body {background-color:rgb(0, 64, 64);}
+
+.oneframe{ 
+	width:1000px; 
+	clear:both; 
+	margin-left:auto; 
+	margin-right:auto; 
+	overflow:hidden;
+	margin-top:5px;   
+	-moz-border-radius:5px;
+	-webkit-border-radius:5px;
+	border-radius:5px;
+}
+  
+.onebox{ 
+	height:auto; 
+	clear:both; 
+	margin-top:5px;  
+	margin-bottom:5px; 
+	font-size:16px; 
+	background-color:rgb(184, 227, 254);
+	 
+	line-height:200%;
+	overflow:hidden;
+	-moz-border-radius:5px;
+	-webkit-border-radius:5px;
+	border-radius:5px;
+} 
+
+.boxinner{ 
+	 margin-left:20px; 
+	 margin-right:20px;
+	 margin-top:5px;
+} 
+ 
+.frames_main
+{  
+	width:68.5%;
+	clear:both;   
+	overflow:hidden;
+	margin-left:0.3rem
+}
+  
+ 
+.frames_tool{ 
+	width:30.5%; 
+	clear:right; 
+	float:right; 
+	right:1rem; 
+	position:fixed;
+	margin-top:20px; 
+}
+
+  
+
+.bktitle_g
+{
+	 color: rgb(112, 112, 112);
+	 font-size: 13px;
+}
+
+.bktartool
+{
+	height:92vh; 
+	clear:both; 
+	background-color:rgb(0, 64, 64); 
+	overflow:hidden; 
+	margin-top:10px;  
+	margin-left:8px;   
+	margin-bottom:15px; 
+	font-size:20px;  
+	border:1px solid #C8C7BC;
+	-moz-border-radius:5px;
+	-webkit-border-radius:5px;
+	border-radius:5px;
+	line-height:200%;
+}
+
+
+.bkmainpanel
+{  
+	clear:both; 
+	background-color:rgb(0, 64, 64); 
+	overflow:hidden; 
+	margin-top:10px;  
+	margin-left:8px;   
+	margin-bottom:15px; 
+	font-size:17px;  
+	border:1px solid rgb(184, 227, 254);
+	-moz-border-radius:5px;
+	-webkit-border-radius:5px;
+	border-radius:5px;
+	line-height:200%;
+}
+
+.para_border {
+  border:2px solid rgb(184, 227, 254); 
+}
+
+.para_sel_border {
+  border:2px solid rgb(0, 64, 128); 
+  border-radius: 4px;
+}
+
+
+.bkelemetpanel
+{  
+	clear:both; 
+	background-color:rgb(0, 64, 64); 
+	overflow:hidden; 
+	margin-top:2px;  
+	margin-left:2px;    
+	font-size:17px;  
+	border:1px solid #C8C7BC;
+	-moz-border-radius:5px;
+	-webkit-border-radius:5px;
+	border-radius:5px;
+	line-height:200%;
+}
+
+.tx_mb_2{
+	margin-bottom:0.2rem;
+}
+
+.bottom_nav{
+	position: fixed;  
+	top:0.05rem; 
+	width:100%;
+}	
+
+
+.tx_topright{
+	position: fixed; 
+	top: 9px; 
+	right:12px; 
+	z-index:9999;
+}	
+
+
+.tx_topmid{
+	position: fixed; 
+	top: 100px; 
+	left:50%; 
+	margin-left:-50px; 
+	z-index:999;
+}	
+
+.tx_bottmright{
+	position: fixed;
+	padding:1rem!important;	
+	right:0!important;
+	bottom:0!important;
+	display:block;
+	z-index:9999;
+}
+
+
+.fixed-btn {
+    position: fixed;
+    right: 1%;
+    bottom: 1%;
+    width: 30px; 
+    font-size: 24px;
+    z-index: 1040; 
+}
+ 
+.fixed-btn-a { 
+    width: 25px;  
+    margin-top:5px;  
+    color:rgb(255, 255, 255)
+}
+
+.tx_select{
+    display: block;
+    width: 100%;
+    padding: .375rem .75rem; 
+    font-weight: 400;
+    line-height: 1.5;
+    color: #212529;
+    background-color: #fff;
+    background-clip: padding-box;
+    border: 1px solid #ced4da;
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    border-radius: .25rem;
+    transition: border-color .15s ease-in-out, box-shadow .15s ease-in-out;
+}
+  
+.tx_modal_header{
+	
+    background-color: rgb(184, 227, 254);
+    border-bottom: 1px solid #055160; 
+    
+    display: flex;
+    flex-shrink: 0;
+    align-items: center;
+    justify-content: space-between;
+    padding: .5rem 1rem; 
+    border-top-left-radius: calc(.3rem - 1px);
+    border-top-right-radius: calc(.3rem - 1px);
+} 
+
+.tx_tipdlg_success{
+	color: #0f5132;
+    background-color: #d1e7dd;
+    border-color: #badbcc;
+}
+
+.tx_tipdlg_danger{
+	color: #842029;
+    background-color: #f8d7da;
+    border-color: #f5c2c7;
+}
+
+
+
+.tx_tipdlginner{
+	position: relative;
+    padding: 0.5rem 1rem; 
+    border: 1px solid transparent;
+    border-radius: .25rem;
+    text-align: center;
+}
+
+ 
+
+.tx_tipdlgmid{
+	position: fixed; 
+	top: 61px; 
+	left:50%; 
+	margin-left:-175px;
+	margin-top:-55px;	
+	z-index:999;
+	transition: opacity .15s linear;
+	border: 1px solid rgba(0,0,0,.1);
+	box-shadow:0 0.5rem 1rem rgba(0,0,0,.15);
+	border-radius: 0.8rem;
+	width: 350px;
+    max-width: 100%;  
+}	
+.tx_msg{
+	
+	width: 600px;
+    height: auto;
+    background-color: aqua;
+    color: black;
+    display: none;
+    position:absolute; 
+    z-index:999;
+}
+
+.tx_msg_show{
+	
+	width: 600px;
+    height: auto;
+    background-color: aqua;
+    color: black;
+    display: block;
+    position:absolute; 
+    z-index:999;
+}

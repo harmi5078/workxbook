@@ -1,0 +1,367 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>文件数据上传管理</title>  
+<link href="../bootstrap/5.1.1/bootstrap.min.css" rel="stylesheet">  
+<script src="../bootstrap/5.1.1/bootstrap.bundle.min.js"></script>  
+<script src="../js/vue.global.js"></script>
+<script src="../js/axios.min.js"></script>
+<script src="js_txnav.js"></script>
+<script src="js_txcommon.js"></script> 
+<link href="css_txworks.css" rel="stylesheet"> 
+
+<style>
+	
+#img_input2 {
+  display: none;
+}
+#img_label2 {
+  background-color: rgb(0, 64, 64);
+  border-radius: 5px;
+  display: inline-block;
+  padding: 10px;
+  cursor: pointer;
+}
+</style>
+</head>
+<body>
+
+<div id="startmenu" style="z-index:88;"></div> 
+<div id = "app" onmousedown="closeNav()" style="z-index: 8;"> 	 
+<div class="tx_topLev2"  > </div>
+<div   id="maindiv"  class="tx_oneframe" onmousedown="closeNav()" style="font-family: 宋体; background-color: aliceblue;">  
+
+ 
+<div class="tx_onerow" style="position: fixed;width: 86.5%;background-color: aliceblue;">  
+	<div   class="tx_acccheckheader" style="margin-top:20px ;" >	 
+			 文件列表
+	</div>
+ 
+	<div class="tx_onerow "  style="font-weight: bold;width: 100%;border-top: var(--cell-boder );"  > 
+		<div style="width: 20%;padding-left:8px;"  >文件名</div >	 
+		<div style="width: 10%;padding-left:8px;" class="tx_cellboder_left ">数据内容</div >	 	
+		<div style="width: 15%;padding-left:8px;" class="tx_cellboder_left ">上传时间</div >	
+		<div style="width: 10%;padding-left:8px;" class="tx_cellboder_left ">状态</div >	  
+		<div style="width: 40%;padding-left:8px;" class="tx_cellboder_left ">备注</div >	 	
+	</div>
+</div>
+ 
+<div style="margin-top: 88px;">
+	<div class="tx_onerow tx_tab_row " style="border-top: var(--cell-boder );" 
+		v-for="(item,index) in items" v-bind:id="'tid'+item.fid" 
+		@mouseover="toselect(item)"
+		@mouseleave="noselect()"> 
+		 <div style="width: 20%;padding-left:8px;cursor: pointer;" @click="downloadFile(item.fid)" >  {{ item.name }} </div >	
+		<div style="width: 10%;padding-left:8px;" 
+		class="tx_cellboder_left tx_onerow"  v-bind:id="'div_type'+item.fid"  >  
+		 	<div style="width: 70%;" v-bind:id="'div_filetype'+item.fid">
+				 <span v-if="item.type==1"> 工厂发票</span>   
+				 <span v-else-if="item.type==2"> 报关单</span> 
+				 <span v-else-if="item.type==6"> 银行对账单</span> 
+				 <span v-else-if="item.type==7"> 流水记录表</span> 
+				 <span v-else-if="item.type==8"> 国税发票清单</span>  
+				 <span v-else> 未分类</span>  
+			</div >   
+			<div  style="width: 30%;padding-left: 10px; cursor: pointer;"  class="dropdown" v-if="fileId==item.fid">  
+				<a   data-bs-toggle="dropdown">
+				<svg xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" viewBox="0 0 32 32"><path fill="currentColor" d="M8 26H4a2 2 0 0 1-2-2v-4h2v4h4zM2 12h2v4H2zm24-4h-2V4h-4V2h4a2 2 0 0 1 2 2zM12 2h4v2h-4zM4 8H2V4a2 2 0 0 1 2-2h4v2H4zm23 24a1 1 0 0 1-.707-.293l-6.138-6.138l-3.323 4.986a1 1 0 0 1-1.79-.268l-6-20a1 1 0 0 1 1.245-1.245l20 6a1 1 0 0 1 .268 1.79l-4.986 3.323l6.138 6.138a1 1 0 0 1 0 1.414l-4 4A1 1 0 0 1 27 32m0-2.414L29.586 27l-7.155-7.155l5.246-3.498l-16.185-4.855l4.855 16.185l3.498-5.246z"/></svg>
+				</a>
+				<ul class="dropdown-menu" style="height: 215px;overflow: auto;">
+		       	 	<li  >
+				  		<div class="dropdown-item" @click="selectType(item.fid,6,$event)">
+							  银行对账单</div>
+		      		</li>
+		      		<li  >
+				  		<div class="dropdown-item" @click="selectType(item.fid,7,$event)" style="border-top: var(--cell-boder );">
+							  流水记录表</div>
+		      		</li>
+		      		
+		      		<li  >
+				  		<div class="dropdown-item" @click="selectType(item.fid,2,$event)" style="border-top: var(--cell-boder );">
+							  报关单</div>
+		      		</li>
+		      		
+		      		<li  >
+				  		<div class="dropdown-item" @click="selectType(item.fid,8,$event)" style="border-top: var(--cell-boder );">
+							  国税发票清单</div>
+		      		</li> 
+		      		<li  >
+				  		<div class="dropdown-item" @click="selectType(item.fid,1,$event)" style="border-top: var(--cell-boder );">
+							  工厂发票</div>
+		      		</li>
+			    </ul>
+					
+			</div > 
+			 
+		</div >		 
+		<div style="width: 15%;padding-left:8px;" class="tx_cellboder_left ">{{ item.createTime }}</div >  
+		<div style="width: 10%;padding-left:8px;" class="tx_cellboder_left tx_onerow"> 
+			<div style="width: 75%;">
+				<span v-if="item.status==1"> 数据处理中</span>  
+		  
+			  <span v-else-if="item.status==2"> 数据处理完成</span>  
+			  <span v-else-if="item.status==4">已归档</span> 
+			  <span v-else> 等待处理</span> 
+		  </div > 
+		  <div  style="width: 25%; cursor: pointer;" @click="saveFileData(item.fid)"  v-if="fileId==item.fid">  
+				 
+					<svg xmlns="http://www.w3.org/2000/svg" width="18px" height="18px" fill="currentColor" class="bi bi-database-up" viewBox="0 0 16 16">
+					  <path fill-rule="evenodd" d="M12.5 16a3.5 3.5 0 1 0 0-7 3.5 3.5 0 0 0 0 7Zm.354-5.854a.5.5 0 0 0-.708 0l-1.5 1.5a.5.5 0 0 0 .708.708l.646-.647V14.5a.5.5 0 0 0 1 0v-2.793l.646.647a.5.5 0 0 0 .708-.708l-1.5-1.5Z"/>
+					  <path fill-rule="evenodd" d="M12.096 6.223A4.92 4.92 0 0 0 13 5.698V7c0 .289-.213.654-.753 1.007a4.493 4.493 0 0 1 1.753.25V4c0-1.007-.875-1.755-1.904-2.223C11.022 1.289 9.573 1 8 1s-3.022.289-4.096.777C2.875 2.245 2 2.993 2 4v9c0 1.007.875 1.755 1.904 2.223C4.978 15.71 6.427 16 8 16c.536 0 1.058-.034 1.555-.097a4.525 4.525 0 0 1-.813-.927C8.5 14.992 8.252 15 8 15c-1.464 0-2.766-.27-3.682-.687C3.356 13.875 3 13.373 3 13v-1.302c.271.202.58.378.904.525C4.978 12.71 6.427 13 8 13h.027a4.552 4.552 0 0 1 0-1H8c-1.464 0-2.766-.27-3.682-.687C3.356 10.875 3 10.373 3 10V8.698c.271.202.58.378.904.525C4.978 9.71 6.427 10 8 10c.262 0 .52-.008.774-.024a4.525 4.525 0 0 1 1.102-1.132C9.298 8.944 8.666 9 8 9c-1.464 0-2.766-.27-3.682-.687C3.356 7.875 3 7.373 3 7V5.698c.271.202.58.378.904.525C4.978 6.711 6.427 7 8 7s3.022-.289 4.096-.777ZM3 4c0-.374.356-.875 1.318-1.313C5.234 2.271 6.536 2 8 2s2.766.27 3.682.687C12.644 3.125 13 3.627 13 4c0 .374-.356.875-1.318 1.313C10.766 5.729 9.464 6 8 6s-2.766-.27-3.682-.687C3.356 4.875 3 4.373 3 4Z"/>
+					</svg> 
+			</div > 
+		  </div >  
+		<div style="width: 40%;padding-left:8px;" class="tx_cellboder_left ">{{ item.remark }}  </div >	
+		 
+		
+		 
+	</div>   
+</div>   
+
+</div>
+<div class="tx_leftbtn" @click="" style="left: 18px;"  data-bs-toggle="modal" data-bs-target="#myModal" >
+	<a >
+	 	<svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" fill="white" class="bi bi-file-earmark-arrow-up" viewBox="0 0 16 16">
+			  <path d="M8.5 11.5a.5.5 0 0 1-1 0V7.707L6.354 8.854a.5.5 0 1 1-.708-.708l2-2a.5.5 0 0 1 .708 0l2 2a.5.5 0 0 1-.708.708L8.5 7.707V11.5z"/>
+			  <path d="M14 14V4.5L9.5 0H4a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h8a2 2 0 0 0 2-2zM9.5 3A1.5 1.5 0 0 0 11 4.5h2V14a1 1 0 0 1-1 1H4a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1h5.5v2z"/>
+			</svg>
+	</a>
+</div> 
+
+   
+<!-- 模态框 \/ -->
+<div class="modal" id="myModal"  >
+	
+	<div class="modal-dialog tx_modal_dlg" style="max-width: 68.5%;">
+    <div class="modal-content">
+
+      <!-- 模态框头部 -->
+      <div class="tx_modal_header">
+        <h4 class="modal-title">上传文件</h4>
+        <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+      </div>
+
+
+		<div id="uploaddiv" class="container mt-3"   > 
+		 
+		 	<div id="drop_zone" class="tx_dropfiles" >
+				 <div class="tx_dropfiles_innerdesc2"> 
+					   批量,最多10个  
+				</div> 
+				  
+				<div  class=" tx_dropfiles_innerdesc">  
+					    PDF/Excel格式的报关单、发票，拖到这里  
+				</div> 
+				 
+				 <div class="tx_dropfiles_btn"> 
+					   <input id="img_input2" type="file" multiple="multiple" accept="pdf/xls/*"  @change="uploadFile" />
+						<label for="img_input2" id="img_label2">选择文件</label>
+				</div> 
+			 </div>
+			<div id="result" style="padding-top:10px ;padding-bottom: 10px;">
+				 
+			</div> 
+		<iframe src="" frameborder="0" name="frameName" style="height: 1px;display: none;"></iframe>
+	   
+	</div>
+</div>
+</div>  
+</div>
+<!-- /\ modal -->
+
+
+</div>
+ 
+<script>
+ 	
+const app = {
+
+	data() {
+		return {
+		  items : [] ,	 
+		  startmenuHtml : getStartMenuHtml_fb() ,
+		  fstartpage:1,
+		  fileId:0
+		   
+		}
+	},
+	mounted () { 
+		
+		this.reloadData()
+		window.updateTables = this.reloadData;
+	},
+	methods: { 
+		  
+		reloadData(event) { 
+			
+			const params = {  
+				  type : 1
+			  }
+			
+			 axios
+			  .get('/getfiles',{params:params} )
+			  .then(response => (this.items = response.data.reObject))
+			  .catch(function (error) { // 请求失败处理
+				showErrTips("数据加载失败：" + error) 
+			});
+		}  ,
+		loadData(item)
+		{ 
+			 
+			const params = {  
+				  fid : item.fid,
+				  name:item.name,
+				  fileName:item.fileName,
+				  filePath:item.filePath,
+				  status:item.status
+			  }
+			  
+			  axios
+			  .post('/loadbefile', params )
+			  .then(
+			  function (response) {
+				 showOKTips(params.shortDesc + "添加成功！")
+			  } 
+			  )
+			  .catch(function (error) { // 请求失败处理
+				  showErrTips(params.shortDesc + "添加失败！")
+			});    
+		},
+		selectType(fid,type,e)
+		{
+			console.log(e)
+			console.log(e.srcElement.innerHTML)
+			
+			
+			const params = {  
+				fid:fid,
+				type:type,
+				typeDesc:e.srcElement.innerHTML
+			}	
+	 
+			axios.post('/mideyfiletype',params)
+			  .then(response => {
+					document.getElementById("div_filetype" + fid).innerHTML = e.srcElement.innerHTML;
+					tipDiv("div_type" + fid)
+					  
+			  })
+			  .catch(function (error) {  
+				 showErrTips("更新失败：" + error) 
+			});
+		},
+		saveFileData(fileId)
+		{
+			const params = {  
+				fid:fileId  
+			}	
+	 
+			axios.post('/savefiledata',params)
+			  .then(response => {
+					showOKTips("提交成功") 
+			  })
+			  .catch(function (error) {  
+				 	showErrTips("提交失败：" + error) 
+			});
+		},
+		uploadFile(event) {   
+	       
+	      	let files = event.target.files;   
+			uploadFiles(files)
+	    } ,
+	    downloadFile(fileId)
+	    {
+			const fileUrl = '/downld?fid=' + fileId; 
+      		window.open(fileUrl);
+		},
+	    toselect(fileItem)
+		{  
+			this.fileId = fileItem.fid
+		},
+		noselect()
+		{ 
+			this.fileId = 0
+		}
+	}  
+}
+ 
+vm = Vue.createApp(app).mount('#app')
+ 
+</script>
+<script type="text/javascript">
+function clearFile(){
+   document.getElementById("billentry").value = ""
+}
+   
+function handleFileSelect(evt) {
+	evt.stopPropagation();
+	evt.preventDefault();
+	
+	var files = evt.dataTransfer.files; // 文件对象
+	
+	uploadFiles(files);
+	 
+}
+
+function uploadFiles(files) {
+	
+	document.getElementById('result').innerHTML  = ""
+	  
+	  // 处理多文件
+	var output = [];
+	
+	for (var i = 0, f; f = files[i]; i++) { 
+		var filename = f.name
+		fileExt = filename.substring(filename.lastIndexOf('.') + 1);
+		if(fileExt=="pdf" || fileExt=="PDF" || fileExt=="xls" || fileExt=="XLS")
+		{ 
+			var formData = new FormData();
+			
+			formData.append('file', f);
+			
+			axios.post('/uploadonlyfile', formData).then(
+			  function (response) { 
+				  var upFile = response.data.reObject
+				  showResult(upFile.fileName +":&emsp; " + response.data.reMsg  );
+				   
+				   
+			}).catch(function (error) { // 请求失败处理
+				 
+				showResult( f.name + "上传失败：" + error);
+			});
+			
+			 
+		}else{
+			showResult(f.name   + ":&emsp;文件格式不正确" ); 
+		} 
+		
+	} 
+	  
+}
+
+function showResult(msg)
+{
+	var shtml = "<div class='tx_onerow '  >" + msg + "</div>"
+	
+	// 显示文件信息
+	var innerHTML = document.getElementById('result').innerHTML 
+	innerHTML = innerHTML + shtml
+	document.getElementById('result').innerHTML  = innerHTML
+	
+}
+
+function handleDragOver(evt) {
+	evt.stopPropagation();
+	evt.preventDefault();
+	evt.dataTransfer.dropEffect = 'copy';
+}
+
+// Setup the dnd listeners.
+var dropZone = document.getElementById('drop_zone');
+dropZone.addEventListener('dragover', handleDragOver, false);
+dropZone.addEventListener('drop', handleFileSelect, false);
+
+</script> 
+
+</body>
+</html>

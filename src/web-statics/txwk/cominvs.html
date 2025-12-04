@@ -1,0 +1,94 @@
+<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8">
+<title>供应商台账</title>  
+<link href="../bootstrap/5.1.1/bootstrap.min.css" rel="stylesheet">  
+<script src="../bootstrap/5.1.1/bootstrap.bundle.min.js"></script>  
+<script src="../js/vue.global.js"></script>
+<script src="../js/axios.min.js"></script>
+<script src="js_txnav.js"></script>
+<script src="js_txcommon.js"></script> 
+<link href="css_txworks.css" rel="stylesheet"> 
+
+</head>
+<body>
+ 
+<div id="startmenu" style="z-index:88;"></div> 
+<div id = "app" onmousedown="closeNav()" style="z-index: 8;"> 	
+	
+<div class="tx_topLev2"  > </div>
+<div  id="maindiv"  class="tx_oneframe" onmousedown="closeNav()"  style="font-family: 宋体; background-color: aliceblue;"> 
+	     
+	     
+<div class="tx_onerow" style="position: fixed;width: 86.5%;background-color: aliceblue;">  
+	<div   class="tx_acccheckheader" style="margin-top:20px ;" >	 
+			 供应商公司台账
+	</div>
+ 
+	<div class="tx_onerow "  style="font-weight: bold;width: 100%;border-top: var(--cell-boder );"  > 
+		<div style="width: 25%;padding-left:8px;"><input type="text"  @change="reloadData()" v-model="comName" class="tx_acekTitleLabel" placeholder="公司名称"  > </div >	 
+		<div style="width: 18%;padding-left:8px;"  class="tx_cellboder_left ">报关总额</div >	
+		<div style="width: 18%;padding-left:8px;"  class="tx_cellboder_left ">流水统计</div > 	
+		<div style="width: 18%;padding-left:8px;"  class="tx_cellboder_left ">支付统计</div >	
+		<div style="width: 16%;padding-left:8px;"  class="tx_cellboder_left ">发票总额</div >	 
+	</div>
+
+</div >	  
+	     
+
+<div style="margin-top: 88px;">
+<div class="tx_onerow tx_tab_row " style="border-top: var(--cell-boder );" v-for="(item,index) in items" v-bind:id="'tid'+item.tid">  
+	<div style="width: 25%;padding-left:8px;" >  {{ item.fullName }} </div >	
+	<div style="width: 18%;padding-left:8px;" class="tx_cellboder_left">  {{ formatAmt(item.exportAmt) }} </div >	
+	<div style="width: 18%;padding-left:8px;" class="tx_cellboder_left">  {{ formatAmt(item.accAmt) }} </div >		 
+	<div style="width: 18%;padding-left:8px;" class="tx_cellboder_left">{{ formatAmt(item.payedAmt) }}</div >  
+	<div style="width: 16%;padding-left:8px;" class="tx_cellboder_left"> {{ formatAmt(item.invoiceAmt) }} </div >    
+</div>    
+</div>
+</div>
+  
+</div>
+ 
+<script>
+ 	
+const app = {
+
+	data() {
+		return {
+		  items : [] ,	 
+		  startmenuHtml : getStartMenuHtml_fb()  ,
+		  comName:''  
+		}
+	},
+	mounted () {
+		this.reloadData()
+	},
+	methods: { 
+		formatAmt(amt)
+		{
+			return formatNumber(amt)
+		} , 
+		reloadData() { 
+			
+			const params = {   
+				name:this.comName
+		 	}	
+		 
+			  axios
+			  .get('/getcompinvs',{params:params})
+			  .then(response => (this.items = response.data.reObject))
+			  .catch(function (error) { // 请求失败处理
+				showErrTips("数据加载失败：" + error) 
+			});
+		}   
+	}  
+}
+ 
+vm = Vue.createApp(app).mount('#app')
+ 
+</script>
+ 
+
+</body>
+</html>
